@@ -23,6 +23,7 @@ private final JwtService jwtService;
 private final AuthenticationManager authenticationManager;
     public com.GreenThumb.GT.response.AuthenticationResponse register(RegisterPayload request) {
 
+
         var user= User.builder()
                 .userName(request.getFullName())
                 .email(request.getEmail())
