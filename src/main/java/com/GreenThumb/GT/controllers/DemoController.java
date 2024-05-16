@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/GreenThumb/api/demo")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class DemoController {
 
     @GetMapping("/democ")
-    @PreAuthorize("hasAuthority('ADMIN')")
+   // @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> sayHello() {
         return ResponseEntity.ok("Hellooooooo");
     }
