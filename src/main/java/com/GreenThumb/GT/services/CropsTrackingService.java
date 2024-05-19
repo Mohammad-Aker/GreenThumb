@@ -1,7 +1,7 @@
 package com.GreenThumb.GT.services;
 
 import com.GreenThumb.GT.models.CropsTracking;
-import com.GreenThumb.GT.repositories.CropsTrackingRepository;
+import com.GreenThumb.GT.repository.CropsTrackingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

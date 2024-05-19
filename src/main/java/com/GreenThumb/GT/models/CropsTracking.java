@@ -1,6 +1,5 @@
 package com.GreenThumb.GT.models;
 
-import com.GreenThumb.GT.models.User.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
