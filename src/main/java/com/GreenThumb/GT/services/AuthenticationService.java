@@ -1,6 +1,5 @@
 package com.GreenThumb.GT.services;
 
-import com.GreenThumb.GT.models.User.Role;
 import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.payload.authentication.AuthenticationPayload;
 import com.GreenThumb.GT.payload.authentication.RegisterPayload;
@@ -22,6 +21,7 @@ private final PasswordEncoder passwordEncoder;
 private final JwtService jwtService;
 private final AuthenticationManager authenticationManager;
     public com.GreenThumb.GT.response.AuthenticationResponse register(RegisterPayload request) {
+
 
         var user= User.builder()
                 .userName(request.getFullName())
