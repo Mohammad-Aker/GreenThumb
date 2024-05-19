@@ -1,7 +1,7 @@
 package com.GreenThumb.GT.services;
 
 import com.GreenThumb.GT.models.Crop;
-import com.GreenThumb.GT.repository.CropRepository;
+import com.GreenThumb.GT.repositories.CropRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
