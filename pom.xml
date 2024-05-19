@@ -123,6 +123,12 @@
             <artifactId>jakarta.validation-api</artifactId>
             <version>3.0.2</version>
         </dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.9.3</version> <!-- Use the latest version available -->
+		</dependency>
     </dependencies>
 	<dependencyManagement>
 		<dependencies>
