@@ -1,5 +1,6 @@
 package com.GreenThumb.GT.DTO;
 
+import com.GreenThumb.GT.models.Resource.ResourceType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,8 +9,9 @@ import lombok.Setter;
 public class ExchangeDTO {
     private Long id;
     private Long resourceId;
-    private Long requestId;  // Add this field to link to resource requests
+    private Long requestId;  // Link to resource requests
     private String fromUserEmail;
     private String toUserEmail;
     private String status;
+    private ResourceType resourceType;  // Add this field
 }

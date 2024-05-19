@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @Service
 public class ExchangeService {
 
@@ -98,10 +97,14 @@ public class ExchangeService {
                 Resource resource = exchange.getResource();
                 User toUser = exchange.getToUser();
                 resource.setOwner(toUser);
+
+                // Reduce the resource quantity
+                ResourceRequest request = exchange.getRequest();
+                int requestedQuantity = request.getQuantity();
+                resource.setQuantity(resource.getQuantity() - requestedQuantity);
                 resourceRepository.save(resource);
 
                 // Change the status of the request to 'CLOSED'
-                ResourceRequest request = exchange.getRequest();
                 request.setStatus("CLOSED");
                 resourceRequestRepository.save(request);
             }

@@ -45,7 +45,7 @@ public class SearchService {
     public List<ExchangeDTO> searchExchanges(SearchDTO searchDTO) {
         return exchangeRepository.findAll().stream()
                 .filter(exchange -> searchDTO.getResourceType() == null || exchange.getResource().getType() == searchDTO.getResourceType())
-                .filter(exchange -> searchDTO.getOwnerEmail() == null || exchange.getFromUser().getEmail().equals(searchDTO.getOwnerEmail()))
+                .filter(exchange -> searchDTO.getOwnerEmail() == null || exchange.getFromUser().getEmail().equals(searchDTO.getOwnerEmail()) || exchange.getToUser().getEmail().equals(searchDTO.getOwnerEmail()))
                 .filter(exchange -> searchDTO.getExchangeStatus() == null || exchange.getStatus().equals(searchDTO.getExchangeStatus()))
                 .map(this::convertExchangeToDTO)
                 .collect(Collectors.toList());
@@ -67,7 +67,7 @@ public class SearchService {
         ResourceRequestDTO dto = new ResourceRequestDTO();
         dto.setId(request.getId());
         dto.setUserEmail(new UserEmailDTO(request.getUser().getEmail()));
-        dto.setResourceId(convertResourceToDTO(request.getResource()).getId());
+        dto.setResourceId(request.getResource().getId());
         dto.setResourceType(request.getResourceType());
         dto.setQuantity(request.getQuantity());
         dto.setDescription(request.getDescription());
@@ -78,11 +78,12 @@ public class SearchService {
     private ExchangeDTO convertExchangeToDTO(Exchange exchange) {
         ExchangeDTO dto = new ExchangeDTO();
         dto.setId(exchange.getId());
-        dto.setResourceId(convertResourceToDTO(exchange.getResource()).getId());
-        dto.setRequestId(convertRequestToDTO(exchange.getRequest()).getId());
-        dto.setFromUserEmail(new UserEmailDTO(exchange.getFromUser().getEmail()).getEmail());
-        dto.setToUserEmail(new UserEmailDTO(exchange.getToUser().getEmail()).getEmail());
+        dto.setResourceId(exchange.getResource().getId());
+        dto.setRequestId(exchange.getRequest().getId());
+        dto.setFromUserEmail(exchange.getFromUser().getEmail());
+        dto.setToUserEmail(exchange.getToUser().getEmail());
         dto.setStatus(exchange.getStatus());
+        dto.setResourceType(exchange.getResource().getType());  // Set the resource type
         return dto;
     }
 }
