@@ -1,7 +1,11 @@
-package com.GreenThumb.GT.controllers;
+package com.GreenThumb.GT.controllers.CropControllers;
 
-import com.GreenThumb.GT.models.CropsTracking;
-import com.GreenThumb.GT.services.*;
+import com.GreenThumb.GT.models.CropsTracking.CropsTracking;
+import com.GreenThumb.GT.services.CropsServices.CropsTrackingService;
+import com.GreenThumb.GT.services.ExternalAPIsServices.GeocodingService;
+import com.GreenThumb.GT.services.ExternalAPIsServices.SoilDataService;
+import com.GreenThumb.GT.services.ExternalAPIsServices.SoilService;
+import com.GreenThumb.GT.services.ExternalAPIsServices.WeatherApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;

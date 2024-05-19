@@ -1,6 +1,6 @@
-package com.GreenThumb.GT.repositories;
+package com.GreenThumb.GT.repositories.CropsRepositories;
 
-import com.GreenThumb.GT.models.Crop;
+import com.GreenThumb.GT.models.CropsTracking.Crop;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

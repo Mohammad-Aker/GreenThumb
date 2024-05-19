@@ -1,6 +1,6 @@
-package com.GreenThumb.GT.repositories;
+package com.GreenThumb.GT.repositories.CropsRepositories;
 
-import com.GreenThumb.GT.models.CropsTracking;
+import com.GreenThumb.GT.models.CropsTracking.CropsTracking;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

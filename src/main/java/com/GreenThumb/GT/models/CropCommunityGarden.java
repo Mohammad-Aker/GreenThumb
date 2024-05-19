@@ -1,7 +1,7 @@
 package com.GreenThumb.GT.models;
 
+import com.GreenThumb.GT.models.CropsTracking.Crop;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

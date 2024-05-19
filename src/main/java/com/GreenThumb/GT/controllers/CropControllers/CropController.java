@@ -1,7 +1,7 @@
-package com.GreenThumb.GT.controllers;
+package com.GreenThumb.GT.controllers.CropControllers;
 
-import com.GreenThumb.GT.models.Crop;
-import com.GreenThumb.GT.services.CropService;
+import com.GreenThumb.GT.models.CropsTracking.Crop;
+import com.GreenThumb.GT.services.CropsServices.CropService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
