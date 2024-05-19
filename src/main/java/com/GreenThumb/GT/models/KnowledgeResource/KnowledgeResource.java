@@ -2,7 +2,7 @@ package com.GreenThumb.GT.models.KnowledgeResource;
 
 import com.GreenThumb.GT.models.ResourceRating.ResourceRating;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.payload.Rates.Views;
+import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.Views;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
@@ -31,8 +31,8 @@ public class KnowledgeResource {
     @JsonView(Views.Public.class)
     private String contentUrl;  // Changed from 'content' to 'filePath' for clarity
 
-   /* @NotBlank
-    private String contenttype;*/
+//dto ----> user what to fill
+
 
     @ManyToOne
     @JoinColumn(name = "user_email", referencedColumnName = "email")
