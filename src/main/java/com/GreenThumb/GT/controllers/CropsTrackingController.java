@@ -1,9 +1,7 @@
 package com.GreenThumb.GT.controllers;
 
 import com.GreenThumb.GT.models.CropsTracking;
-import com.GreenThumb.GT.services.CropsTrackingService;
-import com.GreenThumb.GT.services.SoilDataService;
-import com.GreenThumb.GT.services.WeatherApiService;
+import com.GreenThumb.GT.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cropstracking")
@@ -21,12 +20,18 @@ public class CropsTrackingController {
     private CropsTrackingService cropsTrackingService;
     private WeatherApiService weatherApiService;
     private SoilDataService soilDataService;
+    private SoilService soilService;
+
+    private GeocodingService geocodingService;
+
 
     @Autowired
-    public CropsTrackingController(CropsTrackingService cropsTrackingService, WeatherApiService weatherApiService,SoilDataService soilDataService) {
+    public CropsTrackingController(CropsTrackingService cropsTrackingService, WeatherApiService weatherApiService,SoilDataService soilDataService,GeocodingService geocodingService, SoilService soilService) {
         this.cropsTrackingService = cropsTrackingService;
         this.weatherApiService = weatherApiService;
         this.soilDataService=soilDataService;
+        this.geocodingService=geocodingService;
+        this.soilService=soilService;
     }
 
     @GetMapping
@@ -128,6 +133,73 @@ public class CropsTrackingController {
         }
     }
 
+
+
+
+    //  GEOCODING TO GET LATITUDE AND LONGITUDE OF A SPECIFIC LOCATION TO GET SOIL DETAILS
+    @GetMapping("/geocode/{userEmail}/{cropId}")
+    public ResponseEntity<Map<String, Float>> geocodeAddress(@PathVariable String userEmail, @PathVariable Long cropId) {
+        try {
+            String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
+
+            if (location == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            Map<String, Float> coordinates = geocodingService.getGeocodingData(location);
+            return new ResponseEntity<>(coordinates, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+//  SOIL DETAILS OF A SPECIFIC LOCATION
+    @GetMapping("/soil/{userEmail}/{cropId}")
+    public ResponseEntity<Map<String, Object>> getSoilData(@PathVariable String userEmail, @PathVariable Long cropId) {
+        try {
+            String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
+            if (location == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            Map<String, Float> coordinates = geocodingService.getGeocodingData(location);
+            float longitude = coordinates.get("lng");
+            float latitude = coordinates.get("lat");
+            Map<String, Object> soilData = soilDataService.getSoilData(longitude, latitude);
+            return new ResponseEntity<>(soilData, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+
+
+
+    // BETTER SOIL DETAILS BUT FOR NEPAL AREA ONLY
+    @GetMapping("/soill/{userEmail}/{cropId}")
+    public ResponseEntity<Map<String, Object>> getSoil(@PathVariable String userEmail, @PathVariable Long cropId) {
+        try {
+            String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
+
+            if (location == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            Map<String, Float> coordinates = geocodingService.getGeocodingData(location);
+            float longitude = coordinates.get("lng");
+            float latitude = coordinates.get("lat");
+            Map<String, Object> soilData = soilService.getSoilData(longitude, latitude);
+            return new ResponseEntity<>(soilData, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
     /* T3BTTTTTTTTTTTTTTTTTTT

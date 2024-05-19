@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.payload.Rates;
+package com.GreenThumb.GT.DTO.KnowledgeResourceDTOs;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class IndividualsInfoPayload {
+public class IndividualsInfoDTO {
     private String userEmail;
     private Double rating;
     private Date timestamp;

@@ -1,23 +1,18 @@
-package com.GreenThumb.GT.services;
+package com.GreenThumb.GT.services.KnowledgeResourceServices;
 
+import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.KnowledgeResourceDTO;
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
 
 
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
-import com.GreenThumb.GT.repositories.KnowledgeResourceRepository;
+import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
+import com.GreenThumb.GT.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.MalformedURLException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -28,13 +23,13 @@ public class KnowledgeResourceService {
 
     private final KnowledgeResourceRepository knowledgeResourceRepository;
 
-    private final FileStorageService fileStorageService;
+    private final UserRepository userRepository;
+
 
     @Autowired
-    public KnowledgeResourceService(KnowledgeResourceRepository knowledgeResourceRepository, FileStorageService fileStorageService) {
+    public KnowledgeResourceService(KnowledgeResourceRepository knowledgeResourceRepository, UserRepository userRepository) {
         this.knowledgeResourceRepository = knowledgeResourceRepository;
-        this.fileStorageService = fileStorageService;
-
+        this.userRepository =  userRepository;
     }
 
 
@@ -111,14 +106,29 @@ public class KnowledgeResourceService {
     }
 
     ////////////////////////////////////////// add or create //////////////////////////////////////////////////
-
-    public Optional<KnowledgeResource> createResource(KnowledgeResource resource) {
-        if (knowledgeResourceRepository.existsByTitle(resource.getTitle()) ||
-                knowledgeResourceRepository.existsByContentUrl(resource.getContentUrl())) {
-            return Optional.empty(); // Indicates creation failure due to existing title or content URL
+    public KnowledgeResource createResource(KnowledgeResourceDTO resourceDTO, String userEmail) {
+        if (knowledgeResourceRepository.existsByTitle(resourceDTO.getTitle())) {
+            throw new IllegalStateException("Resource with the given title already exists.");
         }
-        return Optional.of(knowledgeResourceRepository.save(resource));
+
+        if (knowledgeResourceRepository.existsByContentUrl(resourceDTO.getContentUrl())) {
+            throw new IllegalStateException("Resource with the given content URL already exists.");
+        }
+
+        // Assuming you've mapped ResourceDTO to KnowledgeResource entity correctly
+        KnowledgeResource resource = new KnowledgeResource();
+        resource.setTitle(resourceDTO.getTitle());
+        resource.setContentUrl(resourceDTO.getContentUrl());
+        resource.setType(resourceDTO.getType());
+        resource.setCategory(resourceDTO.getCategory());
+        resource.setTags(resourceDTO.getTags());
+        resource.setAuthor(resourceDTO.getAuthor());
+        resource.setUser(userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail)));
+
+        return knowledgeResourceRepository.save(resource);
     }
+
 
 
     public KnowledgeResource addTags(String title, Set<String> newTags, String currentUserEmail) {

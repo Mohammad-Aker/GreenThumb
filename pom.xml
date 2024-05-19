@@ -135,6 +135,12 @@
 			<artifactId>okhttp</artifactId>
 			<version>4.9.3</version> <!-- Use the latest version available -->
 		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20210307</version> <!-- This is one of the versions available; check for the latest version -->
+		</dependency>
     </dependencies>
 	<dependencyManagement>
 		<dependencies>

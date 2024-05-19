@@ -1,13 +1,13 @@
-package com.GreenThumb.GT.services;
+package com.GreenThumb.GT.services.KnowledgeResourceServices;
 
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.ResourceRating.ResourceRating;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.response.ReportedResourceResponse;
+import com.GreenThumb.GT.response.KnowledgeResourceResponses.ReportedResourceResponse;
 import com.GreenThumb.GT.repositories.UserRepository;
-import com.GreenThumb.GT.repositories.KnowledgeResourceRepository;
-import com.GreenThumb.GT.repositories.ResourceRatingRepository;
-import com.GreenThumb.GT.response.ResourceRatingResponse;
+import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
+import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.ResourceRatingRepository;
+import com.GreenThumb.GT.response.KnowledgeResourceResponses.ResourceRatingResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

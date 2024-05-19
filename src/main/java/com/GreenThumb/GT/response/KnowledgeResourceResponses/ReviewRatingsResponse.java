@@ -1,7 +1,7 @@
-package com.GreenThumb.GT.response;
+package com.GreenThumb.GT.response.KnowledgeResourceResponses;
 
 
-import com.GreenThumb.GT.payload.Rates.IndividualsInfoPayload;
+import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.IndividualsInfoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +14,5 @@ import java.util.List;
 public class ReviewRatingsResponse {
     private String resourceTitle;
     private Double averageRating;
-    private List<IndividualsInfoPayload> ratings;
+    private List<IndividualsInfoDTO> ratings;
 }
