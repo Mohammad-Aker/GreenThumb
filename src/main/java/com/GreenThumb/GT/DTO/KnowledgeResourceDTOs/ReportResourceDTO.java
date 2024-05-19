@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.payload.Rates;
+package com.GreenThumb.GT.DTO.KnowledgeResourceDTOs;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportResourcePayload {
+public class ReportResourceDTO {
     private String title;
     private String reportDescription;
 

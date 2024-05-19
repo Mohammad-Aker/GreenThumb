@@ -1,37 +1,29 @@
-package com.GreenThumb.GT.controllers;
+package com.GreenThumb.GT.controllers.KnowledgeResourceControllers;
 
+import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.KnowledgeResourceDTO;
+import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.payload.Rates.Views;
-import com.GreenThumb.GT.repositories.KnowledgeResourceRepository;
-import com.GreenThumb.GT.services.FileStorageService;
-import com.GreenThumb.GT.services.KnowledgeResourceService;
-import com.GreenThumb.GT.services.ResourceRatingService;
+import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.Views;
+import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
+import com.GreenThumb.GT.services.KnowledgeResourceServices.KnowledgeResourceService;
+import com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingService;
 import com.fasterxml.jackson.annotation.JsonView;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
-import static com.GreenThumb.GT.services.ResourceRatingService.logger;
 
 @RestController
 //@PreAuthorize("hasAuthority('ADMIN')")
@@ -39,14 +31,12 @@ import static com.GreenThumb.GT.services.ResourceRatingService.logger;
 public class KnowledgeResourceController {
 
     private final KnowledgeResourceService knowledgeResourceService;
-    private final FileStorageService fileStorageService;
+    private final KnowledgeResourceRepository knowledgeResourceRepository;
 
     @Autowired
-    public KnowledgeResourceController(KnowledgeResourceService knowledgeResourceService, ResourceRatingService resourceRatingService, KnowledgeResourceRepository knowledgeResourceRepository
-            , FileStorageService fileStorageService
-    ) {
+    public KnowledgeResourceController(KnowledgeResourceService knowledgeResourceService, ResourceRatingService resourceRatingService, KnowledgeResourceRepository knowledgeResourceRepository) {
         this.knowledgeResourceService = knowledgeResourceService;
-        this.fileStorageService = fileStorageService;
+        this.knowledgeResourceRepository = knowledgeResourceRepository;
     }
 
 
@@ -87,103 +77,27 @@ public class KnowledgeResourceController {
 
 
 
-    @GetMapping("/view/{title}")
-    public ResponseEntity<?> viewFile(@PathVariable String title, HttpServletRequest request) {
-        try {
-            KnowledgeResource resource = knowledgeResourceService.getResourceByTitle(title);
-
-            // Load file as Resource
-            Resource file = fileStorageService.loadFileAsResource(resource.getContentUrl());
-
-            // Try to determine file's content type
-            String contentType = request.getServletContext().getMimeType(file.getFile().getAbsolutePath());
-            if (contentType == null) {
-                contentType = "application/octet-stream";  // Default MIME type
-            }
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getContentUrl() + "\"")
-                    .body(file);
-        } catch (EntityNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        } catch (IOException ex) {
-            return ResponseEntity.internalServerError().body("Could not determine file type.");
-        }
-    }
 
 
     //////////////////////////////////////////////////////// add create ////////////////////////////////////////////////
 
 
-
-    @PostMapping("/upload")
-    public ResponseEntity<?> uploadFileAndCreateResource(@AuthenticationPrincipal User user,
-                                                         @RequestParam("file") MultipartFile file,
-                                                         @RequestParam("title") String title,
-                                                         @RequestParam("type") ResourceType type,
-                                                         @RequestParam("category") ResourceCategory category,
-                                                         @RequestParam(required = false) Set<String> tags,
-                                                         @RequestParam(required = false) String author) {
-
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("File is required and cannot be empty.");
-        }
-
-        // Store the file and get the storage path
-        String fileDownloadUri;
+    @PostMapping("/create")
+    public ResponseEntity<?> createResource(@Valid @RequestBody KnowledgeResourceDTO resourceDTO, Authentication authentication) {
         try {
-            fileDownloadUri = fileStorageService.storeFile(file);
+            String userEmail = ((User) authentication.getPrincipal()).getEmail();
+            KnowledgeResource createdResource = knowledgeResourceService.createResource(resourceDTO, userEmail);
+            return ResponseEntity.ok(createdResource);
+        } catch (IllegalStateException e) {
+            // Handle exceptions related to resource uniqueness
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            // Handle exceptions related to user existence or other argument issues
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to store file.");
+            // Handle unexpected exceptions
+            return ResponseEntity.internalServerError().body("An error occurred while creating the resource.");
         }
-
-        // Create a new resource with the file path
-        KnowledgeResource resource = new KnowledgeResource();
-        resource.setAuthor(author);
-        resource.setTitle(title);
-        resource.setContentUrl(fileDownloadUri);
-        resource.setType(type);
-        resource.setCategory(category);
-        resource.setTags(tags);
-        resource.setUser(user);
-
-
-
-        // Save the resource using your service
-        Optional<KnowledgeResource> createdResourceOpt = knowledgeResourceService.createResource(resource);
-        if (createdResourceOpt.isPresent()) {
-            return ResponseEntity.ok(createdResourceOpt.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Resource with given title or content URL already exists.");
-        }
-    }
-    @GetMapping("/download/{title}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String title) {
-        KnowledgeResource resource = knowledgeResourceService.getResourceByTitle(title);
-        if (resource == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
-        }
-
-        Resource file = fileStorageService.loadFileAsResource(resource.getContentUrl());
-        if (file == null || !file.exists()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
-        }
-
-        String filename = URLEncoder.encode(Objects.requireNonNull(file.getFilename()), StandardCharsets.UTF_8);
-        logger.info("Preparing to download file: {}", filename);
-
-        String contentType = "application/octet-stream";  // Default MIME type
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .body(file);
-    }
-
-    // Exception handler in your @Controller or @ControllerAdvice
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
-        return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
     }
 
 
@@ -254,6 +168,21 @@ public class KnowledgeResourceController {
     }
 
 
+////////////////////////////////////////////////////////////
+    @GetMapping("/resources/download/{title}")
+    public ResponseEntity<Object> downloadResource(@PathVariable Long resourceId) {
+        KnowledgeResource resource = knowledgeResourceRepository.findById(resourceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+
+        if (resource.getContentUrl() != null && !resource.getContentUrl().isEmpty()) {
+            URI googleDriveDownloadUri = URI.create(resource.getContentUrl().replace("/view?usp=sharing", "/uc?export=download"));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(googleDriveDownloadUri);
+            return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+        }
+
+        throw new IllegalStateException("Resource does not have a valid Google Drive URL");
+    }
 
 
     }

@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.repositories;
+package com.GreenThumb.GT.repositories.KnowledgeResourceRepositories;
 
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
