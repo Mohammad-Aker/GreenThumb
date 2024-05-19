@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.response;
+package com.GreenThumb.GT.response.KnowledgeResourceResponses;
 
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
