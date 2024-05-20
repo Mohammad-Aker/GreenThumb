@@ -1,12 +1,12 @@
-package com.GreenThumb.GT.services;
+package com.GreenThumb.GT.services.ResourceExchange;
 
-import com.GreenThumb.GT.DTO.*;
-import com.GreenThumb.GT.models.Exchange;
-import com.GreenThumb.GT.models.Resource.Resource;
-import com.GreenThumb.GT.models.ResourceRequest;
-import com.GreenThumb.GT.repositories.ExchangeRepository;
-import com.GreenThumb.GT.repositories.ResourceRepository;
-import com.GreenThumb.GT.repositories.ResourceRequestRepository;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.*;
+import com.GreenThumb.GT.models.ResourceExchange.Exchange;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
+import com.GreenThumb.GT.models.ResourceExchange.ResourceRequest;
+import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ExchangeRepository;
+import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ResourceRepository;
+import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ResourceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

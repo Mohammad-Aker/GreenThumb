@@ -1,6 +1,6 @@
-package com.GreenThumb.GT.DTO;
+package com.GreenThumb.GT.DTO.ResourceExchangeDTO;
 
-import com.GreenThumb.GT.models.Resource.ResourceType;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
 import lombok.Getter;
 import lombok.Setter;
 

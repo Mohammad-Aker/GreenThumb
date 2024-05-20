@@ -1,6 +1,6 @@
-package com.GreenThumb.GT.models;
+package com.GreenThumb.GT.models.ResourceExchange;
 
-import com.GreenThumb.GT.models.Resource.Resource;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
 import com.GreenThumb.GT.models.User.User;
 import jakarta.persistence.*;
 import lombok.*;

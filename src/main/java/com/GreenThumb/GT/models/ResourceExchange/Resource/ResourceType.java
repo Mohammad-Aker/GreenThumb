@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.models.Resource;
+package com.GreenThumb.GT.models.ResourceExchange.Resource;
 
 public enum ResourceType {
     TOOL,

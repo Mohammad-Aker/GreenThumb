@@ -1,10 +1,10 @@
-package com.GreenThumb.GT.controllers;
+package com.GreenThumb.GT.controllers.ResourceExchangeControllers;
 
-import com.GreenThumb.GT.DTO.ResourceRequestDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceRequestDTO;
 import com.GreenThumb.GT.exceptions.InvalidRequestException;
 import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.services.ResourceRequestService;
+import com.GreenThumb.GT.services.ResourceExchange.ResourceRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

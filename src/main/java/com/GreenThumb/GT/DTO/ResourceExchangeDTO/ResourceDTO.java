@@ -1,8 +1,8 @@
-package com.GreenThumb.GT.DTO;
+package com.GreenThumb.GT.DTO.ResourceExchangeDTO;
 
 import com.GreenThumb.GT.Views.Views;
-import com.GreenThumb.GT.models.Resource.Resource;
-import com.GreenThumb.GT.models.Resource.ResourceType;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

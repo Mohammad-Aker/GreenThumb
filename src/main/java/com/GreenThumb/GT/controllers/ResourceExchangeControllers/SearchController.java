@@ -1,15 +1,17 @@
-package com.GreenThumb.GT.controllers;
+package com.GreenThumb.GT.controllers.ResourceExchangeControllers;
 
-import com.GreenThumb.GT.DTO.*;
-import com.GreenThumb.GT.models.Resource.ResourceType;
-import com.GreenThumb.GT.services.SearchService;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ExchangeDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceRequestDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.SearchDTO;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
+import com.GreenThumb.GT.services.ResourceExchange.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("GreenThumb/api/search")
@@ -34,16 +36,6 @@ public class SearchController {
         List<ResourceDTO> resources = searchService.searchResources(searchDTO);
         List<ResourceRequestDTO> requests = searchService.searchRequests(searchDTO);
         List<ExchangeDTO> exchanges = searchService.searchExchanges(searchDTO);
-
-        // Ensure requests and exchanges are filtered appropriately based on the criteria
-        if (searchDTO.getResourceType() != null) {
-            requests = requests.stream()
-                    .filter(request -> request.getResourceType() == searchDTO.getResourceType())
-                    .collect(Collectors.toList());
-            exchanges = exchanges.stream()
-                    .filter(exchange -> exchange.getResourceType() == searchDTO.getResourceType())
-                    .collect(Collectors.toList());
-        }
 
         return ResponseEntity.ok().body(
                 new SearchResults(resources, requests, exchanges)

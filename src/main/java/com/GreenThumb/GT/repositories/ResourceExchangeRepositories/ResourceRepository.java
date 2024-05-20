@@ -1,7 +1,7 @@
-package com.GreenThumb.GT.repositories;
+package com.GreenThumb.GT.repositories.ResourceExchangeRepositories;
 
-import com.GreenThumb.GT.models.Resource.Resource;
-import com.GreenThumb.GT.models.Resource.ResourceType;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
