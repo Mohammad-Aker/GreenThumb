@@ -1,10 +1,11 @@
-package com.GreenThumb.GT.controllers;
+package com.GreenThumb.GT.controllers.ResourceExchangeControllers;
 
-import com.GreenThumb.GT.DTO.*;
-import com.GreenThumb.GT.models.Exchange;
-import com.GreenThumb.GT.models.ResourceRequest;
-import com.GreenThumb.GT.models.Resource.ResourceType;
-import com.GreenThumb.GT.services.SearchService;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ExchangeDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceRequestDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.SearchDTO;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
+import com.GreenThumb.GT.services.ResourceExchange.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +21,7 @@ public class SearchController {
     private SearchService searchService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('USER')or hasAuthority('EXPERT')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('EXPERT')")
     public ResponseEntity<?> search(@RequestParam(required = false) ResourceType resourceType,
                                     @RequestParam(required = false) String ownerEmail,
                                     @RequestParam(required = false) String requestStatus,

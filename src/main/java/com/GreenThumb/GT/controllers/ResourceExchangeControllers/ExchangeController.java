@@ -1,8 +1,8 @@
-package com.GreenThumb.GT.controllers;
+package com.GreenThumb.GT.controllers.ResourceExchangeControllers;
 
-import com.GreenThumb.GT.DTO.ExchangeDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ExchangeDTO;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.services.ExchangeService;
+import com.GreenThumb.GT.services.ResourceExchange.ExchangeService;
 import com.GreenThumb.GT.exceptions.UnauthorizedOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

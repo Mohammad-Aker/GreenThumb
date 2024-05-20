@@ -1,15 +1,15 @@
-package com.GreenThumb.GT.services;
+package com.GreenThumb.GT.services.ResourceExchange;
 
-import com.GreenThumb.GT.DTO.ExchangeDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ExchangeDTO;
 import com.GreenThumb.GT.exceptions.InvalidOperationException;
 import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
-import com.GreenThumb.GT.models.Exchange;
-import com.GreenThumb.GT.models.Resource.Resource;
-import com.GreenThumb.GT.models.ResourceRequest;
+import com.GreenThumb.GT.models.ResourceExchange.Exchange;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
+import com.GreenThumb.GT.models.ResourceExchange.ResourceRequest;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.repositories.ExchangeRepository;
-import com.GreenThumb.GT.repositories.ResourceRepository;
-import com.GreenThumb.GT.repositories.ResourceRequestRepository;
+import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ExchangeRepository;
+import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ResourceRepository;
+import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ResourceRequestRepository;
 import com.GreenThumb.GT.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 
 @Service
 public class ExchangeService {
@@ -98,10 +97,14 @@ public class ExchangeService {
                 Resource resource = exchange.getResource();
                 User toUser = exchange.getToUser();
                 resource.setOwner(toUser);
+
+                // Reduce the resource quantity
+                ResourceRequest request = exchange.getRequest();
+                int requestedQuantity = request.getQuantity();
+                resource.setQuantity(resource.getQuantity() - requestedQuantity);
                 resourceRepository.save(resource);
 
                 // Change the status of the request to 'CLOSED'
-                ResourceRequest request = exchange.getRequest();
                 request.setStatus("CLOSED");
                 resourceRequestRepository.save(request);
             }

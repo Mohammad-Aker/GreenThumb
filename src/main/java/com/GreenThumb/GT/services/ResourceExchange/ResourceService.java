@@ -1,10 +1,10 @@
-package com.GreenThumb.GT.services;
+package com.GreenThumb.GT.services.ResourceExchange;
 
-import com.GreenThumb.GT.DTO.ResourceCreationDTO;
-import com.GreenThumb.GT.models.Resource.Resource;
-import com.GreenThumb.GT.models.Resource.ResourceType;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceCreationDTO;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.repositories.ResourceRepository;
+import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ResourceRepository;
 import com.GreenThumb.GT.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

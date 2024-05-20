@@ -1,13 +1,13 @@
-package com.GreenThumb.GT.controllers;
+package com.GreenThumb.GT.controllers.ResourceExchangeControllers;
 
-import com.GreenThumb.GT.DTO.ResourceCreationDTO;
-import com.GreenThumb.GT.DTO.ResourceDTO;
-import com.GreenThumb.GT.DTO.UserDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceCreationDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceDTO;
+import com.GreenThumb.GT.DTO.ResourceExchangeDTO.UserDTO;
 import com.GreenThumb.GT.Views.Views;
-import com.GreenThumb.GT.models.Resource.Resource;
-import com.GreenThumb.GT.models.Resource.ResourceType;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
+import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.services.ResourceService;
+import com.GreenThumb.GT.services.ResourceExchange.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
