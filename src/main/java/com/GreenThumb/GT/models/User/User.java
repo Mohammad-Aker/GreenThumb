@@ -52,6 +52,10 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    public boolean isRepresentative() {
+        return this.role == Role.REPRESENTATIVE;
+    }
+
     @Override
     public String getUsername() {
         return email;
