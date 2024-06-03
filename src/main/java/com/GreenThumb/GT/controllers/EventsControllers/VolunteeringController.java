@@ -33,6 +33,11 @@ public class VolunteeringController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/deleteExpired")
+    public ResponseEntity<Void> deleteExpiredVolunteeringRecords() {
+        volunteeringService.deleteExpiredVolunteeringRecords();
+        return ResponseEntity.ok().build();
+    }
     @PostMapping("/join")
     public ResponseEntity<Volunteering> joinEvent(@RequestParam String email,
                                                   @RequestParam Long eventId,

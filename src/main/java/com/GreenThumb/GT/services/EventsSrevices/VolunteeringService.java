@@ -8,6 +8,7 @@ import com.GreenThumb.GT.repositories.EventsRepository.EventRepository;
 import com.GreenThumb.GT.repositories.EventsRepository.VolunteeringRepository;
 import com.GreenThumb.GT.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,6 +26,14 @@ public class VolunteeringService {
     @Autowired
     private EventRepository eventsRepository;
 
+
+
+    @Scheduled(cron = "0 0 0 * * ?") // Runs every day at midnight
+    public void deleteExpiredVolunteeringRecords() {
+        LocalDate today = LocalDate.now();
+        List<Volunteering> expiredRecords = volunteeringRepository.findByEndDateBefore(today);
+        volunteeringRepository.deleteAll(expiredRecords);
+    }
 
     public List<Volunteering> getAllVolunteering() {
         return volunteeringRepository.findAll();

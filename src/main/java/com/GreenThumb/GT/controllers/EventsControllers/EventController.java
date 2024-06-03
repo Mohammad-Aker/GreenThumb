@@ -4,6 +4,7 @@ import com.GreenThumb.GT.models.Events.Events;
 import com.GreenThumb.GT.services.EventsSrevices.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +29,9 @@ public class EventController {
     }
 
 
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('REPRESENTATIVE') or hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
         return ResponseEntity.ok().build();
@@ -36,6 +39,7 @@ public class EventController {
 
 
     @PostMapping
+    @PreAuthorize("hasAuthority('REPRESENTATIVE')")
     public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail) {
         try {
             Events createdEvent = eventService.createEvent(event, userEmail);
