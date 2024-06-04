@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface VolunteeringRepository extends JpaRepository<Volunteering, Long> {
-    List<Volunteering> findByEndDateBefore(LocalDate endDate);
+    //boolean existsByUserAndEvent(User user, Events event);
 }
