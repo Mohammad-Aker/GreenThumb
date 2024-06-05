@@ -1,7 +1,7 @@
 package com.GreenThumb.GT.response.KnowledgeResourceResponses;
 
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
-import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
+import com.GreenThumb.GT.models.KnowledgeResource.ResourceExtension;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ public class ReportedResourceResponse {
     private ResourceCategory category;
     private String resourceTitle;
     private String author;
-    private ResourceType type;
+    private ResourceExtension type;
     private String content;
     private String reportDescription;
 }

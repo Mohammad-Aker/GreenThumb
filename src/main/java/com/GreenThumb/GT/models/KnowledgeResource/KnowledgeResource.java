@@ -46,7 +46,8 @@ public class KnowledgeResource {
 
     @Enumerated(EnumType.STRING)
     @JsonView(Views.Public.class)
-    private ResourceType type;
+    private ResourceExtension type;
+
 
     @Enumerated(EnumType.STRING)
     @JsonView(Views.Public.class)

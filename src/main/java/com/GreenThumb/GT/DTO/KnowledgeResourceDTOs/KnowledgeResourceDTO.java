@@ -2,7 +2,7 @@ package com.GreenThumb.GT.DTO.KnowledgeResourceDTOs;
 
 
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
-import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
+import com.GreenThumb.GT.models.KnowledgeResource.ResourceExtension;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ public class KnowledgeResourceDTO {
     private String title;
     private String contentUrl;
     private String author;
-    private ResourceType type;
+    private ResourceExtension type;
     private ResourceCategory category;
     private Set<String> tags;
 

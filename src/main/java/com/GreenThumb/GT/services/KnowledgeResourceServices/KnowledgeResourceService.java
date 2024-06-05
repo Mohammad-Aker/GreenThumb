@@ -5,14 +5,18 @@ import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
 
 
-import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
+import com.GreenThumb.GT.models.KnowledgeResource.ResourceExtension;
 import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
 import com.GreenThumb.GT.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -167,7 +171,7 @@ public class KnowledgeResourceService {
 
 
     public KnowledgeResource updateResource(String currentTitle, String currentUserEmail,
-                                            String newTitle, String content, String author, ResourceType type,
+                                            String newTitle, String content, String author, ResourceExtension type,
                                             ResourceCategory category, Set<String> tags) {
         Optional<KnowledgeResource> resourceOptional = knowledgeResourceRepository.findByTitle(currentTitle);
         if (!resourceOptional.isPresent()) {
@@ -245,7 +249,50 @@ public class KnowledgeResourceService {
         return true; // Resources were deleted
     }
 
+///////////////////////////////////////// Download ///////////////////////////////////////////
 
+
+    private String transformToDownloadUrl(String url) {
+        if (url.contains("/file/d/") && url.contains("/view")) {
+            return url.replaceAll("/view.*", "/uc?export=download");
+        }
+        return null;  // Consider returning an exception or error message here instead of null
+    }
+    public String fetchUrlByTitle(String title) throws ResourceNotFoundException {
+        KnowledgeResource resource = knowledgeResourceRepository.findByTitle(title)
+                .orElseThrow(() -> new ResourceNotFoundException("Resource titled '" + title + "' not found"));
+        return resource.getContentUrl();
+    }
+
+    public ResponseEntity<InputStreamResource> downloadFile(String title) {
+        try {
+            String originalUrl = fetchUrlByTitle(title);
+            String downloadUrl = transformToDownloadUrl(originalUrl);
+
+            if (downloadUrl == null) {
+                throw new IllegalStateException("Invalid Google Drive URL or transformation failed.");
+            }
+
+            RestTemplate restTemplate = new RestTemplate();
+            InputStreamResource resource = restTemplate.execute(
+                    URI.create(downloadUrl),
+                    HttpMethod.GET,
+                    null,
+                    clientHttpResponse -> new InputStreamResource(clientHttpResponse.getBody()));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + title.replaceAll("[^\\w\\s]", "_") + ".pdf\""); // Assume PDF, adjust if needed
+            headers.setContentType(MediaType.APPLICATION_PDF); // Assume PDF, adjust if needed
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(resource);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
 

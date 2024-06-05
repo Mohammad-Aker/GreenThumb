@@ -1,6 +1,6 @@
 package com.GreenThumb.GT.models.KnowledgeResource;
 
-public enum ResourceType {
+public enum ResourceExtension {
 
     ARTICLE,
     VIDEO,

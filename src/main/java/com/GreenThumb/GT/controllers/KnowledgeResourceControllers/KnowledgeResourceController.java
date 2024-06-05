@@ -4,7 +4,7 @@ import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.KnowledgeResourceDTO;
 import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
-import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
+import com.GreenThumb.GT.models.KnowledgeResource.ResourceExtension;
 import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.Views;
 import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
@@ -13,22 +13,15 @@ import com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingServic
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
+
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.URI;
 import java.util.*;
-
-import static com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingService.logger;
 
 @RestController
 //@PreAuthorize("hasAuthority('ADMIN')")
@@ -155,7 +148,7 @@ public class KnowledgeResourceController {
                                             @RequestParam(required = false) String newTitle,
                                             @RequestParam(required = false) String content,
                                             @RequestParam(required = false) String author,
-                                            @RequestParam(required = false) ResourceType type,
+                                            @RequestParam(required = false) ResourceExtension type,
                                             @RequestParam(required = false) ResourceCategory category,
                                             @RequestParam(required = false) Set<String> tags) {
         try {
@@ -202,27 +195,23 @@ public class KnowledgeResourceController {
     }
 
 
-
-
-////////////////////////////////////////////////////////////
-//test transformToDownloadUrl method
-// test download error handling
-
+/*
 
 @GetMapping("/download/{title}")
 public ResponseEntity<Resource> downloadResource(@PathVariable String title) {
     try {
         KnowledgeResource resource = knowledgeResourceRepository.findByTitle(title)
-
                 .orElseThrow(() -> new ResourceNotFoundException("Resource titled '" + title + "' not found"));
 
         if (resource.getContentUrl() == null || resource.getContentUrl().isEmpty()) {
             throw new IllegalStateException("Resource titled '" + title + "' does not have a valid URL");
         }
 
+        String downloadUrl = transformToDownloadUrl(resource.getContentUrl());
+
         RestTemplate restTemplate = new RestTemplate();
         ByteArrayResource fileResource = restTemplate.execute(
-                URI.create(resource.getContentUrl()),
+                URI.create(downloadUrl),
                 HttpMethod.GET,
                 null,
                 response -> {
@@ -239,7 +228,7 @@ public ResponseEntity<Resource> downloadResource(@PathVariable String title) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + title.replaceAll("[^\\w\\s]", "_") + ".pdf\"");
-        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentType(MediaType.APPLICATION_PDF);  // Assume PDF, adjust if different file types are expected
 
         assert fileResource != null;
         return ResponseEntity.ok()
@@ -253,18 +242,11 @@ public ResponseEntity<Resource> downloadResource(@PathVariable String title) {
         logger.error("Error processing download request: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-}
-/*
-    private String transformToDownloadUrl(String url) {
-        // Ensure that the URL can be transformed for direct downloading from Google Drive
-        if (url.contains("/file/d/") && url.contains("/view")) {
-            // Replace the viewing part of the URL with the download trigger
-            // Make sure to escape characters that have special meaning in regex (like ? and =)
-            return url.replaceAll("/view\\?usp=sharing", "/uc?export=download")
-                    .replaceAll("/view$", "/uc?export=download");
-        }
-        return null;
-    }*/
+}*/
+
+
+
+
 
 
 }
