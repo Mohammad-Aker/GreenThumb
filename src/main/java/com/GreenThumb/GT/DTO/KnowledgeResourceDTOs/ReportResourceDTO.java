@@ -13,5 +13,4 @@ import lombok.NoArgsConstructor;
 public class ReportResourceDTO {
     private String title;
     private String reportDescription;
-
 }

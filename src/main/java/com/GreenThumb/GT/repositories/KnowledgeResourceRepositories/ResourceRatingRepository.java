@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ResourceRatingRepository extends JpaRepository<ResourceRating, Long> {
@@ -17,4 +18,5 @@ public interface ResourceRatingRepository extends JpaRepository<ResourceRating, 
   boolean existsByUserAndResourceAndReportedIsTrue(User user, KnowledgeResource resource);
   ResourceRating findByResourceAndUser( User user,KnowledgeResource resource);
 
+    Optional<ResourceRating> findByUserAndResource(User user, KnowledgeResource resource);
 }
