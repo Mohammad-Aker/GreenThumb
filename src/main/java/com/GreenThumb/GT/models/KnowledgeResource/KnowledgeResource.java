@@ -29,10 +29,8 @@ public class KnowledgeResource {
     @NotBlank
     @JsonView(Views.Public.class)
     @Lob
-    @Column(name="fileData")
     private byte[] data;
 
-//dto ----> user what to fill
 
 
     @ManyToOne

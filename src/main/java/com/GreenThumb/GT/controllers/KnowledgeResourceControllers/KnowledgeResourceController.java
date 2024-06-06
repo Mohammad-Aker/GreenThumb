@@ -22,7 +22,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
@@ -108,18 +111,23 @@ public class KnowledgeResourceController {
     }
 
     @GetMapping("/download/{title}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable String title) {
+    public ResponseEntity<String> downloadFile(@PathVariable String title) {
         Optional<KnowledgeResource> documentOptional = knowledgeResourceRepository.findByTitle(title);
 
         if (!documentOptional.isPresent()) {
             return ResponseEntity.notFound().build();
         }
 
-        KnowledgeResource document = documentOptional.get(); // Extract the document if present
+        KnowledgeResource document = documentOptional.get();
+        Path path = Paths.get(System.getProperty("user.home"), "Downloads", document.getTitle() + ".pdf");
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getTitle() + "\"")
-                .body(document.getData());
+        try (FileOutputStream outputStream = new FileOutputStream(path.toFile())) {
+            outputStream.write(document.getData());
+            return ResponseEntity.ok("File saved successfully at " + path.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file: " + e.getMessage());
+        }
     }
 
 
