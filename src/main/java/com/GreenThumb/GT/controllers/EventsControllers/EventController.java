@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-
 @RestController
 @RequestMapping("/events")
 public class EventController {
@@ -27,13 +26,11 @@ public class EventController {
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventService.deleteEvent(id);
         return ResponseEntity.ok().build();
     }
-
 
     @PostMapping
     public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail) {
@@ -45,5 +42,13 @@ public class EventController {
         }
     }
 
-
+    @PostMapping("/{id}/partnerships")
+    public ResponseEntity<?> addPartnershipToEvent(@PathVariable Long id, @RequestBody PartnershipDTO partnershipDTO) {
+        try {
+            Events event = eventService.addPartnershipToEvent(id, partnershipDTO);
+            return ResponseEntity.ok(event);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
