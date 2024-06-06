@@ -20,7 +20,7 @@ public interface KnowledgeResourceRepository extends JpaRepository<KnowledgeReso
 
   boolean existsByTitle(String title);
 
-  boolean existsByContentUrl(String contentUrl);
+ // boolean existsByContentUrl(String contentUrl);
 }
 
 
