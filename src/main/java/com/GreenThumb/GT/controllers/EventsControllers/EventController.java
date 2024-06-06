@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
 @RestController
 @RequestMapping("/events")
 public class EventController {
@@ -33,22 +34,12 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail) {
+    public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail, @RequestParam Long partnerId) {
         try {
-            Events createdEvent = eventService.createEvent(event, userEmail);
+            Events createdEvent = eventService.createEvent(event, userEmail, partnerId);
             return ResponseEntity.ok(createdEvent);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(403).body(null);
-        }
-    }
-
-    @PostMapping("/{id}/partnerships")
-    public ResponseEntity<?> addPartnershipToEvent(@PathVariable Long id, @RequestBody PartnershipDTO partnershipDTO) {
-        try {
-            Events event = eventService.addPartnershipToEvent(id, partnershipDTO);
-            return ResponseEntity.ok(event);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

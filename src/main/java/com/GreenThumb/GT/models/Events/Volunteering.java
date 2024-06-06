@@ -1,4 +1,5 @@
 package com.GreenThumb.GT.models.Events;
+
 import com.GreenThumb.GT.models.User.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -23,12 +24,16 @@ public class Volunteering {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_email")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Events event;
+
+    @ManyToOne
+    @JoinColumn(name = "partner_id", nullable = true)
+    private Partner partner;
 
     @NotBlank
     private String role;
