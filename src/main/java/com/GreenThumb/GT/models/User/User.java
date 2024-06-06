@@ -1,5 +1,7 @@
 package com.GreenThumb.GT.models.User;
 
+import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.Views;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,6 +28,7 @@ public class User implements UserDetails {
 
     @Id
     @NotBlank
+    @JsonView(Views.Public.class)
     private String email;
 
     @NotBlank
