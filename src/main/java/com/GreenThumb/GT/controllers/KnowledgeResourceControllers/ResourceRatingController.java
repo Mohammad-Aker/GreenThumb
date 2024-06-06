@@ -87,7 +87,24 @@ public class ResourceRatingController {
 
 
 
-    //download >>needs error handling
 
     // dtos you fill them
-}
+
+    ///////////////////////////////////////////// Delete Reports /////////////////////////////////////////////////
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/clear")
+    public ResponseEntity<?> clearAllReports() {
+        try {
+            resourceRatingService.clearAllReports();
+            return ResponseEntity.ok("All reports cleared for all ratings.");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
+
+    }
+

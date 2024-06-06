@@ -19,4 +19,5 @@ public interface ResourceRatingRepository extends JpaRepository<ResourceRating, 
   ResourceRating findByResourceAndUser( User user,KnowledgeResource resource);
 
     Optional<ResourceRating> findByUserAndResource(User user, KnowledgeResource resource);
+  List<ResourceRating> findAllByReportedIsTrue();
 }

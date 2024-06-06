@@ -5,7 +5,7 @@ import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
 
 
-import com.GreenThumb.GT.models.KnowledgeResource.ResourceExtension;
+import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
 import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
 import com.GreenThumb.GT.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
@@ -114,7 +116,7 @@ public class KnowledgeResourceService {
     }
 
     ////////////////////////////////////////// add or create //////////////////////////////////////////////////
-    public KnowledgeResource createResource(KnowledgeResourceDTO resourceDTO, String userEmail) {
+   /* public KnowledgeResource createResource(KnowledgeResourceDTO resourceDTO, String userEmail) {
         if (knowledgeResourceRepository.existsByTitle(resourceDTO.getTitle())) {
             throw new IllegalStateException("Resource with the given title already exists.");
         }
@@ -126,7 +128,7 @@ public class KnowledgeResourceService {
         // Assuming you've mapped ResourceDTO to KnowledgeResource entity correctly
         KnowledgeResource resource = new KnowledgeResource();
         resource.setTitle(resourceDTO.getTitle());
-        resource.setContentUrl(resourceDTO.getContentUrl());
+///
         resource.setType(resourceDTO.getType());
         resource.setCategory(resourceDTO.getCategory());
         resource.setTags(resourceDTO.getTags());
@@ -136,7 +138,7 @@ public class KnowledgeResourceService {
 
         return knowledgeResourceRepository.save(resource);
     }
-
+*/
 
     public KnowledgeResource addTags(String title, Set<String> newTags, String currentUserEmail) {
         Optional<KnowledgeResource> optionalResource = knowledgeResourceRepository.findByTitle(title);
@@ -171,7 +173,7 @@ public class KnowledgeResourceService {
 
 
     public KnowledgeResource updateResource(String currentTitle, String currentUserEmail,
-                                            String newTitle, String content, String author, ResourceExtension type,
+                                            String newTitle, String content, String author, ResourceType type,
                                             ResourceCategory category, Set<String> tags) {
         Optional<KnowledgeResource> resourceOptional = knowledgeResourceRepository.findByTitle(currentTitle);
         if (!resourceOptional.isPresent()) {
@@ -191,7 +193,7 @@ public class KnowledgeResourceService {
         }
 
         // Update other fields as necessary
-        if (content != null) existingResource.setContentUrl(content);
+       // if (content != null) existingResource.setContentUrl(content);
         if (author != null) existingResource.setAuthor(author);
         if (type != null) existingResource.setType(type);
         if (category != null) existingResource.setCategory(category);
@@ -252,49 +254,15 @@ public class KnowledgeResourceService {
 ///////////////////////////////////////// Download ///////////////////////////////////////////
 
 
-    private String transformToDownloadUrl(String url) {
-        if (url.contains("/file/d/") && url.contains("/view")) {
-            return url.replaceAll("/view.*", "/uc?export=download");
-        }
-        return null;  // Consider returning an exception or error message here instead of null
+
+
+
+    public String storeFile(MultipartFile file) throws IOException {
+        KnowledgeResource document = new KnowledgeResource();
+        document.setTitle(file.getOriginalFilename());
+        document.setData(file.getBytes());
+
+        knowledgeResourceRepository.save(document);
+        return "File stored successfully!";
     }
-    public String fetchUrlByTitle(String title) throws ResourceNotFoundException {
-        KnowledgeResource resource = knowledgeResourceRepository.findByTitle(title)
-                .orElseThrow(() -> new ResourceNotFoundException("Resource titled '" + title + "' not found"));
-        return resource.getContentUrl();
-    }
-
-    public ResponseEntity<InputStreamResource> downloadFile(String title) {
-        try {
-            String originalUrl = fetchUrlByTitle(title);
-            String downloadUrl = transformToDownloadUrl(originalUrl);
-
-            if (downloadUrl == null) {
-                throw new IllegalStateException("Invalid Google Drive URL or transformation failed.");
-            }
-
-            RestTemplate restTemplate = new RestTemplate();
-            InputStreamResource resource = restTemplate.execute(
-                    URI.create(downloadUrl),
-                    HttpMethod.GET,
-                    null,
-                    clientHttpResponse -> new InputStreamResource(clientHttpResponse.getBody()));
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + title.replaceAll("[^\\w\\s]", "_") + ".pdf\""); // Assume PDF, adjust if needed
-            headers.setContentType(MediaType.APPLICATION_PDF); // Assume PDF, adjust if needed
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(resource);
-        } catch (ResourceNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
-
-
 }

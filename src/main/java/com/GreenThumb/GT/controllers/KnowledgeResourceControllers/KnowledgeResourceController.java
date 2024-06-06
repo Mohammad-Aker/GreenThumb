@@ -4,7 +4,7 @@ import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.KnowledgeResourceDTO;
 import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
-import com.GreenThumb.GT.models.KnowledgeResource.ResourceExtension;
+import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
 import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.Views;
 import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
@@ -20,7 +20,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -96,9 +98,35 @@ public class KnowledgeResourceController {
 
 
     //////////////////////////////////////////////////////// add create ////////////////////////////////////////////////
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            return ResponseEntity.ok(knowledgeResourceService.storeFile(file));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Failed to store file.");
+        }
+    }
+
+    @GetMapping("/download/{title}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable String title) {
+        Optional<KnowledgeResource> documentOptional = knowledgeResourceRepository.findByTitle(title);
+
+        if (!documentOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        KnowledgeResource document = documentOptional.get(); // Extract the document if present
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getTitle() + "\"")
+                .body(document.getData());
+    }
 
 
-    @PreAuthorize("hasAuthority('EXPERT')")
+
+
+
+    /*    @PreAuthorize("hasAuthority('EXPERT')")
     @PostMapping("/create")
     public ResponseEntity<?> createResource(@Valid @RequestBody KnowledgeResourceDTO resourceDTO, Authentication authentication) {
         try {
@@ -115,7 +143,7 @@ public class KnowledgeResourceController {
             // Handle unexpected exceptions
             return ResponseEntity.internalServerError().body("An error occurred while creating the resource.");
         }
-    }
+    }*/
 
 
 
@@ -148,7 +176,7 @@ public class KnowledgeResourceController {
                                             @RequestParam(required = false) String newTitle,
                                             @RequestParam(required = false) String content,
                                             @RequestParam(required = false) String author,
-                                            @RequestParam(required = false) ResourceExtension type,
+                                            @RequestParam(required = false) ResourceType type,
                                             @RequestParam(required = false) ResourceCategory category,
                                             @RequestParam(required = false) Set<String> tags) {
         try {
@@ -193,59 +221,6 @@ public class KnowledgeResourceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Generic error handling for other exceptions
         }
     }
-
-
-/*
-
-@GetMapping("/download/{title}")
-public ResponseEntity<Resource> downloadResource(@PathVariable String title) {
-    try {
-        KnowledgeResource resource = knowledgeResourceRepository.findByTitle(title)
-                .orElseThrow(() -> new ResourceNotFoundException("Resource titled '" + title + "' not found"));
-
-        if (resource.getContentUrl() == null || resource.getContentUrl().isEmpty()) {
-            throw new IllegalStateException("Resource titled '" + title + "' does not have a valid URL");
-        }
-
-        String downloadUrl = transformToDownloadUrl(resource.getContentUrl());
-
-        RestTemplate restTemplate = new RestTemplate();
-        ByteArrayResource fileResource = restTemplate.execute(
-                URI.create(downloadUrl),
-                HttpMethod.GET,
-                null,
-                response -> {
-                    try (InputStream is = response.getBody(); ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-                        int nRead;
-                        byte[] data = new byte[1024];
-                        while ((nRead = is.read(data, 0, data.length)) != -1) {
-                            buffer.write(data, 0, nRead);
-                        }
-                        buffer.flush();
-                        return new ByteArrayResource(buffer.toByteArray());
-                    }
-                });
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + title.replaceAll("[^\\w\\s]", "_") + ".pdf\"");
-        headers.setContentType(MediaType.APPLICATION_PDF);  // Assume PDF, adjust if different file types are expected
-
-        assert fileResource != null;
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(fileResource.contentLength())
-                .body(fileResource);
-    } catch (ResourceNotFoundException | IllegalStateException ex) {
-        logger.error(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-    } catch (Exception e) {
-        logger.error("Error processing download request: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
-}*/
-
-
-
 
 
 

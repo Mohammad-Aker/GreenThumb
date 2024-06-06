@@ -198,7 +198,7 @@ public class ResourceRatingService {
                             .resourceTitle(resource.getTitle())
                             .author(resource.getAuthor())
                             .type(resource.getType())
-                            .content(resource.getContentUrl())
+                          //  .content(resource.getContentUrl())
                             .reportDescription(rating.getReportDescription())
                             .build();
                 })
@@ -206,10 +206,30 @@ public class ResourceRatingService {
     }
 
 
+    @Transactional
+    public void clearAllReports() {
+        // Retrieve all ratings that have been reported
+        List<ResourceRating> reportedRatings = resourceRatingRepository.findAllByReportedIsTrue();
 
+        if (reportedRatings.isEmpty()) {
+            throw new IllegalStateException("No reported resources found.");
+        }
 
+        // Set reported to false and clear report descriptions for all reported ratings
+        reportedRatings.forEach(rating -> {
+            rating.setReported(false);
+            rating.setReportDescription(null);
+        });
 
+        // Save the updated ratings
+        resourceRatingRepository.saveAll(reportedRatings);
 
+        // Optionally, update average ratings for each affected resource
+        reportedRatings.stream()
+                .map(ResourceRating::getResource)
+                .distinct()
+                .forEach(this::updateAverageRating);
+    }
 
 }
 
