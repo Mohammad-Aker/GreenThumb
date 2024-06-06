@@ -27,9 +27,10 @@ public class KnowledgeResource {
     private String title;
 
     @NotBlank
-    @Column(unique = true)
     @JsonView(Views.Public.class)
-    private String contentUrl;  // Changed from 'content' to 'filePath' for clarity
+    @Lob
+    @Column(name="fileData")
+    private byte[] data;
 
 //dto ----> user what to fill
 
@@ -47,6 +48,7 @@ public class KnowledgeResource {
     @Enumerated(EnumType.STRING)
     @JsonView(Views.Public.class)
     private ResourceType type;
+
 
     @Enumerated(EnumType.STRING)
     @JsonView(Views.Public.class)

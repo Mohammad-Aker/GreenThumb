@@ -8,15 +8,24 @@ import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
 import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
 import com.GreenThumb.GT.repositories.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingService.logger;
 
 @Service
 public class KnowledgeResourceService {
@@ -43,12 +52,13 @@ public class KnowledgeResourceService {
 
     //get resource by title
     public Optional<KnowledgeResource> getResourcesByTitle(String title) {
-        return knowledgeResourceRepository.findByTitle(title);
-    }
-
-    public KnowledgeResource getResourceByTitle(String title) {
-        return knowledgeResourceRepository.findByTitle(title)
-                .orElseThrow(() -> new EntityNotFoundException("Resource not found with title: " + title));
+        try {
+            return knowledgeResourceRepository.findByTitle(title);
+        } catch (Exception e) {
+            // Log and handle database or other exceptions appropriately
+            logger.error("Error retrieving resource by title: {}", title, e);
+            return Optional.empty();
+        }
     }
 
 
@@ -106,7 +116,7 @@ public class KnowledgeResourceService {
     }
 
     ////////////////////////////////////////// add or create //////////////////////////////////////////////////
-    public KnowledgeResource createResource(KnowledgeResourceDTO resourceDTO, String userEmail) {
+   /* public KnowledgeResource createResource(KnowledgeResourceDTO resourceDTO, String userEmail) {
         if (knowledgeResourceRepository.existsByTitle(resourceDTO.getTitle())) {
             throw new IllegalStateException("Resource with the given title already exists.");
         }
@@ -118,7 +128,7 @@ public class KnowledgeResourceService {
         // Assuming you've mapped ResourceDTO to KnowledgeResource entity correctly
         KnowledgeResource resource = new KnowledgeResource();
         resource.setTitle(resourceDTO.getTitle());
-        resource.setContentUrl(resourceDTO.getContentUrl());
+///
         resource.setType(resourceDTO.getType());
         resource.setCategory(resourceDTO.getCategory());
         resource.setTags(resourceDTO.getTags());
@@ -128,112 +138,131 @@ public class KnowledgeResourceService {
 
         return knowledgeResourceRepository.save(resource);
     }
-
-
+*/
 
     public KnowledgeResource addTags(String title, Set<String> newTags, String currentUserEmail) {
-
         Optional<KnowledgeResource> optionalResource = knowledgeResourceRepository.findByTitle(title);
-        if (optionalResource.isPresent()) {
-            KnowledgeResource resource = optionalResource.get();
-            if (!resource.getUser().getEmail().equals(currentUserEmail)) {
-                throw new UnauthorizedException("User is not authorized to update this resource");
-            }
-            resource.getTags().addAll(newTags);
-            return knowledgeResourceRepository.save(resource);
-        } else {
+        if (optionalResource.isEmpty()) {
             throw new ResourceNotFoundException("Resource not found with title " + title);
         }
-    }
 
-    // Custom exception class for unauthorized access
-    public static class UnauthorizedException extends RuntimeException {
-        public UnauthorizedException(String message) {
-            super(message);
+        KnowledgeResource resource = optionalResource.get();
+        if (!resource.getUser().getEmail().equals(currentUserEmail)) {
+            throw new UnauthorizedException("User is not authorized to update this resource");
         }
+
+        resource.getTags().addAll(newTags);
+        return knowledgeResourceRepository.save(resource);
     }
 
-    // Custom exception class for resource not found
     public static class ResourceNotFoundException extends RuntimeException {
         public ResourceNotFoundException(String message) {
             super(message);
         }
     }
 
+    public static class UnauthorizedException extends RuntimeException {
+        public UnauthorizedException(String message) {
+            super(message);
+        }
+    }
+
+
 
 /////////////////////////////////////////////// update //////////////////////////////////////////////////
 
 
-    //update resource info
     public KnowledgeResource updateResource(String currentTitle, String currentUserEmail,
                                             String newTitle, String content, String author, ResourceType type,
                                             ResourceCategory category, Set<String> tags) {
-        KnowledgeResource existingResource = knowledgeResourceRepository.findByTitle(currentTitle)
-                .orElseThrow(() -> new IllegalArgumentException("No resource found with title: " + currentTitle));
+        Optional<KnowledgeResource> resourceOptional = knowledgeResourceRepository.findByTitle(currentTitle);
+        if (!resourceOptional.isPresent()) {
+            throw new IllegalArgumentException("No resource found with title: " + currentTitle);
+        }
 
+        KnowledgeResource existingResource = resourceOptional.get();
         if (!existingResource.getUser().getEmail().equals(currentUserEmail)) {
             throw new SecurityException("You are not authorized to update this resource.");
         }
 
         if (newTitle != null && !newTitle.isEmpty() && !newTitle.equals(currentTitle)) {
             if (knowledgeResourceRepository.findByTitle(newTitle).isPresent()) {
-                throw new IllegalArgumentException("A resource with the new title already exists.");
+                throw new IllegalArgumentException("A resource with the new title '" + newTitle + "' already exists.");
             }
             existingResource.setTitle(newTitle);
         }
 
-        if (content != null) {
-            existingResource.setContentUrl(content);
-        }
-        if (author != null) {
-            existingResource.setAuthor(author);
-        }
-        if (type != null) {
-            existingResource.setType(type);
-        }
-        if (category != null) {
-            existingResource.setCategory(category);
-        }
-        if (tags != null && !tags.isEmpty()) {
-            existingResource.setTags(tags);
-        }
+        // Update other fields as necessary
+       // if (content != null) existingResource.setContentUrl(content);
+        if (author != null) existingResource.setAuthor(author);
+        if (type != null) existingResource.setType(type);
+        if (category != null) existingResource.setCategory(category);
+        if (tags != null && !tags.isEmpty()) existingResource.setTags(new HashSet<>(tags)); // ensure tags are updated properly
 
         return knowledgeResourceRepository.save(existingResource);
     }
 
-
     ////////////////////////////////////// delete ////////////////////////////////////////
-
-
-    //for experts
-    public boolean deleteResource(String title, String userEmail) {
+/*
+    public void deleteResource(String title, String userEmail) throws ResourceNotFoundException, UnauthorizedException {
         Optional<KnowledgeResource> resource = knowledgeResourceRepository.findByTitle(title);
-        if (resource.isPresent()) {
-            KnowledgeResource existingResource = resource.get();
-            if (existingResource.getUser().getEmail().equals(userEmail)) {
-                knowledgeResourceRepository.delete(existingResource);
-                return true;
-            } else {
-                throw new SecurityException("You are not authorized to delete this resource.");
-            }
+        if (!resource.isPresent()) {
+            throw new ResourceNotFoundException("Resource not found with title: " + title);
+        }
+
+        KnowledgeResource existingResource = resource.get();
+        if (existingResource.getUser().getEmail().equals(userEmail) || existingResource.getUser().getRole().name().equals("ADMIN")) {
+            knowledgeResourceRepository.delete(existingResource);
         } else {
-            return false; // Resource not found
+            throw new UnauthorizedException("You are not authorized to delete this resource.");
+        }
+
+    }*/
+
+    public void deleteResource(String title, String userEmail, String userRole) throws ResourceNotFoundException, UnauthorizedException {
+        try {
+            Optional<KnowledgeResource> resourceOpt = knowledgeResourceRepository.findByTitle(title);
+            if (!resourceOpt.isPresent()) {
+                throw new ResourceNotFoundException("Resource not found with title: " + title);
+            }
+
+            KnowledgeResource resource = resourceOpt.get();
+            boolean isOwner = resource.getUser().getEmail().equals(userEmail) && resource.getUser().getRole().name().equals("EXPERT");
+            boolean isAdmin = userRole.equals("ADMIN");
+
+            if (isOwner || isAdmin) {
+                knowledgeResourceRepository.delete(resource);
+            } else {
+                throw new UnauthorizedException("You are not authorized to delete this resource.");
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Database error occurred while deleting the resource.", e);
         }
     }
 
     //for admin
-    public void deleteResourcesByCategory(ResourceCategory category) {
+    public boolean deleteResourcesByCategory(ResourceCategory category) {
         List<KnowledgeResource> resources = knowledgeResourceRepository.findByCategory(category);
-        if (resources != null && !resources.isEmpty()) {
-            knowledgeResourceRepository.deleteAll(resources);
+        if (resources == null || resources.isEmpty()) {
+            return false; // No resources to delete
         }
 
-
+        knowledgeResourceRepository.deleteAll(resources);
+        return true; // Resources were deleted
     }
 
+///////////////////////////////////////// Download ///////////////////////////////////////////
 
 
 
 
 
+    public String storeFile(MultipartFile file) throws IOException {
+        KnowledgeResource document = new KnowledgeResource();
+        document.setTitle(file.getOriginalFilename());
+        document.setData(file.getBytes());
+
+        knowledgeResourceRepository.save(document);
+        return "File stored successfully!";
+    }
 }

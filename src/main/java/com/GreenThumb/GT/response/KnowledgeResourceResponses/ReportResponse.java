@@ -1,5 +1,7 @@
 package com.GreenThumb.GT.response.KnowledgeResourceResponses;
 
+
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,14 +13,11 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResourceRatingResponse {
-
+public class ReportResponse {
 
     //private Long id;
     private String resourceTitle;
     private String userEmail;
-    private Double rating; // Only included in rating response
+    private String reportDescription; // Only included in report response
     private Date createdDate; // Timestamp
-
-
 }
