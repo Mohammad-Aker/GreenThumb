@@ -28,9 +28,4 @@ public class CropCommunityGarden {
 
     private boolean plotNumber;
 
-    public CropCommunityGarden(CommunityGarden communityGarden, Crop crop, boolean plotNumber) {
-        this.communityGarden = communityGarden;
-        this.crop = crop;
-        this.plotNumber = plotNumber;
-    }
 }
