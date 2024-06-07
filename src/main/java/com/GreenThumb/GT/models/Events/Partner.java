@@ -1,21 +1,20 @@
 package com.GreenThumb.GT.models.Events;
-
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Events {
+public class Partner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,24 +27,14 @@ public class Events {
     private String description;
 
     @NotBlank
-    private Date date;
+    private String contactEmail;
 
     @NotBlank
-    private String location;
+    private String contactPhone;
 
     @NotBlank
-    private String duration;
-
-    @Positive
-    private int maxParticipants;
+    private String address;
 
     @NotBlank
-    private String organizer;
-
-    @NotBlank
-    private String eventType;
-
-
-    @ManyToOne
-    private Partner partner;
+    private String website;
 }

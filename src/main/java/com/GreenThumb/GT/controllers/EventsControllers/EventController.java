@@ -28,8 +28,6 @@ public class EventController {
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('REPRESENTATIVE') or hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
@@ -37,17 +35,15 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
-
     @PostMapping
     @PreAuthorize("hasAuthority('REPRESENTATIVE')")
     public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail) {
+    public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail, @RequestParam Long partnerId) {
         try {
-            Events createdEvent = eventService.createEvent(event, userEmail);
+            Events createdEvent = eventService.createEvent(event, userEmail, partnerId);
             return ResponseEntity.ok(createdEvent);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(403).body(null);
         }
     }
-
-
 }
