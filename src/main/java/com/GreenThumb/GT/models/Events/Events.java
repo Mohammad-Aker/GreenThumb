@@ -47,4 +47,6 @@ public class Events {
 
     @NotBlank
     private String eventType;
+
+
 }

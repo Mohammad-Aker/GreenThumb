@@ -1,4 +1,5 @@
 package com.GreenThumb.GT.models.Events;
+
 import com.GreenThumb.GT.models.User.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Volunteering {
 
     @Id
@@ -23,7 +25,7 @@ public class Volunteering {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_email")
     private User user;
 
     @ManyToOne
