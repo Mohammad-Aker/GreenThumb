@@ -45,6 +45,7 @@ public class Events {
     @NotBlank
     private String eventType;
 
+
     @ManyToOne
     private Partner partner;
 }

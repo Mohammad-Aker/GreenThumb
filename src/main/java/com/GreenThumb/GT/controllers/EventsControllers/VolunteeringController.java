@@ -34,6 +34,23 @@ public class VolunteeringController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/deleteExpired")
+    public ResponseEntity<Void> deleteExpiredVolunteeringRecords() {
+        volunteeringService.deleteExpiredVolunteeringRecords();
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/join")
+    public ResponseEntity<Volunteering> joinEvent(@RequestParam String email,
+                                                  @RequestParam Long eventId,
+                                                  @RequestParam String role,
+                                                  @RequestParam String tasks,
+                                                  @RequestParam int hoursVolunteered,
+                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                                  @RequestParam String status,
+                                                  @RequestParam(required = false) String notes) {
+        Volunteering volunteering = volunteeringService.joinEvent(email, eventId, role, tasks, hoursVolunteered, startDate, endDate, status, notes);
+        return ResponseEntity.ok(volunteering);
     @PostMapping("/{eventId}/join")
     public ResponseEntity<Volunteering> joinEvent(@PathVariable Long eventId,@RequestBody Volunteering volunteering) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
