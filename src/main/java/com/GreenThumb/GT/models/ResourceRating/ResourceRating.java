@@ -33,6 +33,12 @@ public class ResourceRating {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 
+    public ResourceRating(User user, KnowledgeResource resource) {
+    }
+
+    public ResourceRating(User user, KnowledgeResource resource, Date date) {
+    }
+
     @PrePersist
     protected void onCreate() {
         createdDate = new Date();

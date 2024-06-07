@@ -13,17 +13,20 @@ import com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingServic
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
+import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 @RestController
 //@PreAuthorize("hasAuthority('ADMIN')")
@@ -40,22 +43,36 @@ public class KnowledgeResourceController {
     }
 
 
+
     //////////////////////////////////////////////////////// get /////////////////////////////////////////////////////
-    // get all resources
+    //get all resources
+    //all checked
+    //the response is good , the auth available for all
     @GetMapping("/allResources")
     @JsonView(Views.Public.class)
     public ResponseEntity<List<KnowledgeResource>> getAllResources() {
         return ResponseEntity.ok(knowledgeResourceService.getAllResources());
     }
 
-    //get resource by title
+
+    //there is error handling if resource not found, works properly
     @GetMapping("/search")
-    public ResponseEntity<KnowledgeResource> getResourceByTitle(@RequestParam String title) {
+    @JsonView(Views.Public.class)  // Apply the Public view to only serialize fields included in the Public view
+    public ResponseEntity<?> getResourceByTitle(@RequestParam String title) {
         Optional<KnowledgeResource> resource = knowledgeResourceService.getResourcesByTitle(title);
-        return resource.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        if (!resource.isPresent()) {
+            // Return a ResponseEntity with a body containing the error message
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("{\"error\": \"No resource found with the title: " + title + "\"}");
+        }
+        return ResponseEntity.ok(resource.get());
     }
 
 
+
+    //works properly
+    @JsonView(Views.Public.class)
     @GetMapping("/sort")
     public List<KnowledgeResource> sortResources(@RequestParam(required = false) String sortField,
                                                  @RequestParam(required = false) String sortDirection) {
@@ -63,7 +80,11 @@ public class KnowledgeResourceController {
     }
 
 
+
+
+    //works properly
     @GetMapping("/filter")
+    @JsonView(Views.Public.class)
     public ResponseEntity<List<KnowledgeResource>> filterResources(
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String type,
@@ -80,8 +101,40 @@ public class KnowledgeResourceController {
 
 
     //////////////////////////////////////////////////////// add create ////////////////////////////////////////////////
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            return ResponseEntity.ok(knowledgeResourceService.storeFile(file));
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Failed to store file.");
+        }
+    }
+
+    @GetMapping("/download/{title}")
+    public ResponseEntity<String> downloadFile(@PathVariable String title) {
+        Optional<KnowledgeResource> documentOptional = knowledgeResourceRepository.findByTitle(title);
+
+        if (!documentOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        KnowledgeResource document = documentOptional.get();
+        Path path = Paths.get(System.getProperty("user.home"), "Downloads", document.getTitle() + ".pdf");
+
+        try (FileOutputStream outputStream = new FileOutputStream(path.toFile())) {
+            outputStream.write(document.getData());
+            return ResponseEntity.ok("File saved successfully at " + path.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file: " + e.getMessage());
+        }
+    }
 
 
+
+
+
+    /*    @PreAuthorize("hasAuthority('EXPERT')")
     @PostMapping("/create")
     public ResponseEntity<?> createResource(@Valid @RequestBody KnowledgeResourceDTO resourceDTO, Authentication authentication) {
         try {
@@ -98,91 +151,85 @@ public class KnowledgeResourceController {
             // Handle unexpected exceptions
             return ResponseEntity.internalServerError().body("An error occurred while creating the resource.");
         }
-    }
+    }*/
 
 
 
-
-    //add tags to existing resource
+    @PreAuthorize("hasAuthority('EXPERT')")
+    //auth done
+    //it enables adding tags only to the expert who submitted the resource ?
+    @JsonView(Views.Public.class)
     @PutMapping("/{title}/tags")
-    public ResponseEntity<KnowledgeResource> addTags(@AuthenticationPrincipal User user, @PathVariable String title, @RequestBody Set<String> tags) {
+    public ResponseEntity<?> addTags(@AuthenticationPrincipal User user, @PathVariable String title, @RequestBody Set<String> tags) {
         try {
             KnowledgeResource updatedResource = knowledgeResourceService.addTags(title, tags, user.getEmail());
             return ResponseEntity.ok(updatedResource);
         } catch (KnowledgeResourceService.ResourceNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Resource not found with title: " + title);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         } catch (KnowledgeResourceService.UnauthorizedException e) {
-            return ResponseEntity.status(403).body(null); // 403 Forbidden
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "User is not authorized to update this resource");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         }
     }
 
     /////////////////////////////////////////////// update //////////////////////////////////////////////////
-
-
-    //update resource info
+    @PreAuthorize("hasAuthority('EXPERT')")
+    @JsonView(Views.Public.class)
     @PutMapping("/update")
-    public ResponseEntity<KnowledgeResource> updateResource(@AuthenticationPrincipal User user,
-                                                            @RequestParam String currentTitle,
-                                                            @RequestParam(required = false) String newTitle,
-                                                            @RequestParam(required = false) String content,
-                                                            @RequestParam(required = false) String author,
-                                                            @RequestParam(required = false) ResourceType type,
-                                                            @RequestParam(required = false) ResourceCategory category,
-                                                            @RequestParam(required = false) Set<String> tags) {
+    public ResponseEntity<?> updateResource(@AuthenticationPrincipal User user,
+                                            @RequestParam String currentTitle,
+                                            @RequestParam(required = false) String newTitle,
+                                            @RequestParam(required = false) String content,
+                                            @RequestParam(required = false) String author,
+                                            @RequestParam(required = false) ResourceType type,
+                                            @RequestParam(required = false) ResourceCategory category,
+                                            @RequestParam(required = false) Set<String> tags) {
         try {
-            ResourceType resourceType = (type != null && !type.name().isEmpty()) ? ResourceType.valueOf(type.name()) : null;
-            ResourceCategory resourceCategory = (category != null && !category.name().isEmpty()) ? ResourceCategory.valueOf(category.name()) : null;
-            KnowledgeResource resource = knowledgeResourceService.updateResource(currentTitle, user.getEmail(), newTitle, content, author, resourceType, resourceCategory, tags);
+            KnowledgeResource resource = knowledgeResourceService.updateResource(currentTitle, user.getEmail(), newTitle, content, author, type, category, tags);
             return ResponseEntity.ok(resource);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        } catch (SecurityException e) {
-            return ResponseEntity.status(403).body(null);
+        } catch (IllegalArgumentException | SecurityException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
-
     /////////////////////////////////////////////////////// delete ///////////////////////////////////////////////////
 
-
-    // Delete a specific resource by Title
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('EXPERT')")
     @DeleteMapping("/deleteByTitle")
-    public ResponseEntity<Void> deleteResourceByTitle(@AuthenticationPrincipal User user, @RequestParam String title//, @RequestParam String userEmail
-    ) {
+    public ResponseEntity<Void> deleteResourceByTitle(@AuthenticationPrincipal User user, @RequestParam String title) {
         try {
-            boolean deleted = knowledgeResourceService.deleteResource(title, user.getEmail());
-            if (deleted) {
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (SecurityException e) {
-            return ResponseEntity.status(403).build();
+            String userRole = user.getRole().name();
+            knowledgeResourceService.deleteResource(title, user.getEmail(), userRole);
+            return ResponseEntity.ok().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (KnowledgeResourceService.UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
-
-    //for admin
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/deleteByCategory")
     public ResponseEntity<Void> deleteResourcesByCategory(@RequestParam ResourceCategory category) {
-        knowledgeResourceService.deleteResourcesByCategory(category);
-        return ResponseEntity.ok().build();
-    }
-
-
-////////////////////////////////////////////////////////////
-    @GetMapping("/resources/download/{title}")
-    public ResponseEntity<Object> downloadResource(@PathVariable Long resourceId) {
-        KnowledgeResource resource = knowledgeResourceRepository.findById(resourceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-
-        if (resource.getContentUrl() != null && !resource.getContentUrl().isEmpty()) {
-            URI googleDriveDownloadUri = URI.create(resource.getContentUrl().replace("/view?usp=sharing", "/uc?export=download"));
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(googleDriveDownloadUri);
-            return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+        if (category == null) {
+            return ResponseEntity.badRequest().build(); // Respond with 400 Bad Request if category is null
         }
 
-        throw new IllegalStateException("Resource does not have a valid Google Drive URL");
+        try {
+            boolean deleted = knowledgeResourceService.deleteResourcesByCategory(category);
+            if (!deleted) {
+                return ResponseEntity.notFound().build(); // Respond with 404 Not Found if no resources found for the category
+            }
+            return ResponseEntity.ok().build(); // Respond with 200 OK if deletion was successful
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Respond with 403 Forbidden if the user is not authorized
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Generic error handling for other exceptions
+        }
     }
 
 
-    }
+
+}

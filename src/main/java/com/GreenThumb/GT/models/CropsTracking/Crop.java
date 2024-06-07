@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Date;
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class Crop {
 
     @Id
@@ -38,18 +40,4 @@ public class Crop {
     private int daysToMaturity;
 
     private Date plantingDate;
-
-
-
-    public Crop(String name, String description, String imageUrl, String plantingSeason, String type, String sunlightRequirement, String soilType, int daysToMaturity, Date plantingDate) {
-        this.name = name;
-        this.description = description;
-        this.imageUrl = imageUrl;
-        this.plantingSeason = plantingSeason;
-        this.type = type;
-        this.sunlightRequirement = sunlightRequirement;
-        this.soilType = soilType;
-        this.daysToMaturity = daysToMaturity;
-        this.plantingDate = plantingDate;
-    }
 }

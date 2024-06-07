@@ -3,6 +3,7 @@ package com.GreenThumb.GT.models.CropsTracking;
 import com.GreenThumb.GT.models.User.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.util.Date;
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class CropsTracking {
 
     @Id
@@ -46,15 +48,4 @@ public class CropsTracking {
 
     private int harvestedQuantity;
 
-    public CropsTracking(String userEmail, Long cropId, String rotationNotes, Date plannedPlantingDate, Date actualPlantingDate, Date plannedHarvestDate, Date actualHarvestDate, int harvestedQuantity, String location) {
-        this.userEmail = userEmail;
-        this.cropId = cropId;
-        this.rotationNotes = rotationNotes;
-        this.plannedPlantingDate = plannedPlantingDate;
-        this.actualPlantingDate = actualPlantingDate;
-        this.plannedHarvestDate = plannedHarvestDate;
-        this.actualHarvestDate = actualHarvestDate;
-        this.harvestedQuantity = harvestedQuantity;
-        this.location=location;
-    }
 }
