@@ -37,7 +37,7 @@ public class EventController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('REPRESENTATIVE')")
-    public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail) {
+    //public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail) {
     public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail, @RequestParam Long partnerId) {
         try {
             Events createdEvent = eventService.createEvent(event, userEmail, partnerId);
