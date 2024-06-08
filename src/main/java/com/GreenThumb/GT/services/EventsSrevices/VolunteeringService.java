@@ -2,6 +2,7 @@ package com.GreenThumb.GT.services.EventsSrevices;
 
 import com.GreenThumb.GT.models.Events.Events;
 import com.GreenThumb.GT.models.Events.Volunteering;
+import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.repositories.EventsRepository.EventRepository;
 import com.GreenThumb.GT.repositories.EventsRepository.PartnerRepository;
 import com.GreenThumb.GT.repositories.EventsRepository.VolunteeringRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -54,4 +56,27 @@ public class VolunteeringService {
         volunteeringRepository.save(volunteering);
 
     }
+    /*public void joinEventWithVolDetails(User user, Long eventId, String role, String tasks, int hoursVolunteered,
+                                        LocalDate startDate, LocalDate endDate, String status, String notes) {
+
+        Events events = eventsRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("Community Garden not found with id: " + eventId));
+        Volunteering volunteering = Volunteering.builder()
+                .user(user)
+                .event(eventId)
+                .role(role)
+                .tasks(tasks)
+                .hoursVolunteered(hoursVolunteered)
+                .startDate(startDate)
+                .endDate(endDate)
+                .status(status)
+                .notes(notes)
+                .build();
+
+        return volunteeringRepository.save(volunteering);) {
+
+        volunteering.setEvent(events);
+        volunteeringRepository.save(volunteering);
+
+    }*/
 }
