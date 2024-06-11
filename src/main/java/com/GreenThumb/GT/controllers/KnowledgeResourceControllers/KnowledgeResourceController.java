@@ -30,7 +30,7 @@ import java.util.*;
 
 @RestController
 //@PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping("/resources")
+@RequestMapping("/GreenThumb/api/learningResources")
 public class KnowledgeResourceController {
 
     private final KnowledgeResourceService knowledgeResourceService;
@@ -101,14 +101,14 @@ public class KnowledgeResourceController {
 
 
     //////////////////////////////////////////////////////// add create ////////////////////////////////////////////////
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            return ResponseEntity.ok(knowledgeResourceService.storeFile(file));
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().body("Failed to store file.");
-        }
-    }
+//    @PostMapping("/upload")
+//    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+//        try {
+//            return ResponseEntity.ok(knowledgeResourceService.storeFile(file));
+//        } catch (IOException e) {
+//            return ResponseEntity.internalServerError().body("Failed to store file.");
+//        }
+//    }
 
     @GetMapping("/download/{title}")
     public ResponseEntity<String> downloadFile(@PathVariable String title) {
@@ -134,12 +134,11 @@ public class KnowledgeResourceController {
 
 
 
-    /*    @PreAuthorize("hasAuthority('EXPERT')")
+      @PreAuthorize("hasAuthority('EXPERT')")
     @PostMapping("/create")
-    public ResponseEntity<?> createResource(@Valid @RequestBody KnowledgeResourceDTO resourceDTO, Authentication authentication) {
+    public ResponseEntity<?> createResource(@Valid @RequestBody KnowledgeResourceDTO resourceDTO, @RequestParam("file") MultipartFile file) {
         try {
-            String userEmail = ((User) authentication.getPrincipal()).getEmail();
-            KnowledgeResource createdResource = knowledgeResourceService.createResource(resourceDTO, userEmail);
+            String createdResource = knowledgeResourceService.storeFile(file, resourceDTO);
             return ResponseEntity.ok(createdResource);
         } catch (IllegalStateException e) {
             // Handle exceptions related to resource uniqueness
@@ -151,7 +150,7 @@ public class KnowledgeResourceController {
             // Handle unexpected exceptions
             return ResponseEntity.internalServerError().body("An error occurred while creating the resource.");
         }
-    }*/
+    }
 
 
 
@@ -178,17 +177,16 @@ public class KnowledgeResourceController {
     /////////////////////////////////////////////// update //////////////////////////////////////////////////
     @PreAuthorize("hasAuthority('EXPERT')")
     @JsonView(Views.Public.class)
-    @PutMapping("/update")
+    @PatchMapping("/update")
     public ResponseEntity<?> updateResource(@AuthenticationPrincipal User user,
                                             @RequestParam String currentTitle,
                                             @RequestParam(required = false) String newTitle,
-                                            @RequestParam(required = false) String content,
                                             @RequestParam(required = false) String author,
                                             @RequestParam(required = false) ResourceType type,
                                             @RequestParam(required = false) ResourceCategory category,
                                             @RequestParam(required = false) Set<String> tags) {
         try {
-            KnowledgeResource resource = knowledgeResourceService.updateResource(currentTitle, user.getEmail(), newTitle, content, author, type, category, tags);
+            KnowledgeResource resource = knowledgeResourceService.updateResource(currentTitle, user.getEmail(), newTitle, author, type, category, tags);
             return ResponseEntity.ok(resource);
         } catch (IllegalArgumentException | SecurityException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

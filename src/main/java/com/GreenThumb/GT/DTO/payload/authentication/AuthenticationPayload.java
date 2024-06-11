@@ -1,7 +1,5 @@
-package com.GreenThumb.GT.payload.authentication;
+package com.GreenThumb.GT.DTO.payload.authentication;
 
-
-import com.GreenThumb.GT.models.User.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,13 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterPayload {
+public class AuthenticationPayload {
 
-
-    private String fullName;
     private String email;
     private String password;
-    private String phoneNumber;
-    private Role role;
-
 }

@@ -19,10 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingService.logger;
@@ -116,29 +113,29 @@ public class KnowledgeResourceService {
     }
 
     ////////////////////////////////////////// add or create //////////////////////////////////////////////////
-   /* public KnowledgeResource createResource(KnowledgeResourceDTO resourceDTO, String userEmail) {
-        if (knowledgeResourceRepository.existsByTitle(resourceDTO.getTitle())) {
-            throw new IllegalStateException("Resource with the given title already exists.");
-        }
+//   public KnowledgeResource createResource(KnowledgeResourceDTO resourceDTO, String userEmail) {
+//        if (knowledgeResourceRepository.existsByTitle(resourceDTO.getTitle())) {
+//            throw new IllegalStateException("Resource with the given title already exists.");
+//        }
+//
+//        if (knowledgeResourceRepository.existsByContentUrl(resourceDTO.getContentUrl())) {
+//            throw new IllegalStateException("Resource with the given content URL already exists.");
+//        }
+//
+//        // Assuming you've mapped ResourceDTO to KnowledgeResource entity correctly
+//        KnowledgeResource resource = new KnowledgeResource();
+//        resource.setTitle(resourceDTO.getTitle());
+/////
+//        resource.setType(resourceDTO.getType());
+//        resource.setCategory(resourceDTO.getCategory());
+//        resource.setTags(resourceDTO.getTags());
+//        resource.setAuthor(resourceDTO.getAuthor());
+//        resource.setUser(userRepository.findByEmail(userEmail)
+//                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail)));
+//
+//        return knowledgeResourceRepository.save(resource);
+//    }
 
-        if (knowledgeResourceRepository.existsByContentUrl(resourceDTO.getContentUrl())) {
-            throw new IllegalStateException("Resource with the given content URL already exists.");
-        }
-
-        // Assuming you've mapped ResourceDTO to KnowledgeResource entity correctly
-        KnowledgeResource resource = new KnowledgeResource();
-        resource.setTitle(resourceDTO.getTitle());
-///
-        resource.setType(resourceDTO.getType());
-        resource.setCategory(resourceDTO.getCategory());
-        resource.setTags(resourceDTO.getTags());
-        resource.setAuthor(resourceDTO.getAuthor());
-        resource.setUser(userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail)));
-
-        return knowledgeResourceRepository.save(resource);
-    }
-*/
 
     public KnowledgeResource addTags(String title, Set<String> newTags, String currentUserEmail) {
         Optional<KnowledgeResource> optionalResource = knowledgeResourceRepository.findByTitle(title);
@@ -154,6 +151,8 @@ public class KnowledgeResourceService {
         resource.getTags().addAll(newTags);
         return knowledgeResourceRepository.save(resource);
     }
+
+
 
     public static class ResourceNotFoundException extends RuntimeException {
         public ResourceNotFoundException(String message) {
@@ -173,7 +172,7 @@ public class KnowledgeResourceService {
 
 
     public KnowledgeResource updateResource(String currentTitle, String currentUserEmail,
-                                            String newTitle, String content, String author, ResourceType type,
+                                            String newTitle, String author, ResourceType type,
                                             ResourceCategory category, Set<String> tags) {
         Optional<KnowledgeResource> resourceOptional = knowledgeResourceRepository.findByTitle(currentTitle);
         if (!resourceOptional.isPresent()) {
@@ -257,10 +256,16 @@ public class KnowledgeResourceService {
 
 
 
-    public String storeFile(MultipartFile file) throws IOException {
+    public String storeFile(MultipartFile file, KnowledgeResourceDTO knowledgeResourceDTO) throws IOException {
         KnowledgeResource document = new KnowledgeResource();
         document.setTitle(file.getOriginalFilename());
         document.setData(file.getBytes());
+        document.setAuthor(knowledgeResourceDTO.getAuthor());
+        document.setType(knowledgeResourceDTO.getType());
+        document.setCategory(knowledgeResourceDTO.getCategory());
+        document.setCreatedDate(new Date());
+        document.setUser(userRepository.findByEmail(knowledgeResourceDTO.getUserEmail())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + knowledgeResourceDTO.getUserEmail())));
 
         knowledgeResourceRepository.save(document);
         return "File stored successfully!";

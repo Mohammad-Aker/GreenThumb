@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.response.KnowledgeResourceResponses;
+package com.GreenThumb.GT.DTO.response.KnowledgeResourceResponses;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

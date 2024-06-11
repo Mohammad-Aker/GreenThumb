@@ -1,9 +1,9 @@
 package com.GreenThumb.GT.controllers;
 
 
-import com.GreenThumb.GT.payload.authentication.AuthenticationPayload;
-import com.GreenThumb.GT.payload.authentication.RegisterPayload;
-import com.GreenThumb.GT.response.AuthenticationResponse;
+import com.GreenThumb.GT.DTO.payload.authentication.AuthenticationPayload;
+import com.GreenThumb.GT.DTO.payload.authentication.RegisterPayload;
+import com.GreenThumb.GT.DTO.response.AuthenticationResponse;
 import com.GreenThumb.GT.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

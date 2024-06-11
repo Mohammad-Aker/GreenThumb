@@ -3,14 +3,11 @@ package com.GreenThumb.GT.controllers.KnowledgeResourceControllers;
 import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.RateResourceDTO;
 import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.ReportResourceDTO;
-import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.Views;
-import com.GreenThumb.GT.response.KnowledgeResourceResponses.ReportResponse;
-import com.GreenThumb.GT.response.KnowledgeResourceResponses.ReportedResourceResponse;
-import com.GreenThumb.GT.response.KnowledgeResourceResponses.ResourceRatingResponse;
+import com.GreenThumb.GT.DTO.response.KnowledgeResourceResponses.ReportResponse;
+import com.GreenThumb.GT.DTO.response.KnowledgeResourceResponses.ReportedResourceResponse;
+import com.GreenThumb.GT.DTO.response.KnowledgeResourceResponses.ResourceRatingResponse;
 import com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingService;
-import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,7 +37,7 @@ public class ResourceRatingController {
 
 
 
-    @PostMapping("/rate")
+    @PutMapping("/rate")
     public ResponseEntity<?> rateResource(@AuthenticationPrincipal User user, @RequestBody RateResourceDTO request) {
         try {
             ResourceRatingResponse response = resourceRatingService.rateResource(request.getTitle(), user, request.getRating());
@@ -63,6 +60,7 @@ public class ResourceRatingController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
+
 
 
 

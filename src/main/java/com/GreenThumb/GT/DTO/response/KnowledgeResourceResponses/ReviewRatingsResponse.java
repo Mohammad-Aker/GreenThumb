@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.response.KnowledgeResourceResponses;
+package com.GreenThumb.GT.DTO.response.KnowledgeResourceResponses;
 
 
 import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.IndividualsInfoDTO;

@@ -1,4 +1,5 @@
-package com.GreenThumb.GT.payload.authentication;
+package com.GreenThumb.GT.DTO.response;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationPayload {
+public class AuthenticationResponse {
 
-    private String email;
-    private String password;
+    private String token;
 }

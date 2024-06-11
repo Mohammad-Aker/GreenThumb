@@ -14,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class KnowledgeResourceDTO {
     private String title;
-    private String contentUrl;
+    private String userEmail;
     private String author;
     private ResourceType type;
     private ResourceCategory category;
