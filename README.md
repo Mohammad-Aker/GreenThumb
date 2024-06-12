@@ -6,7 +6,7 @@
   <br>
   <h1>Greenthumb 🌱</h1>
   <strong>Welcome to GreenThumb, Cultivating urban green spaces and sustainable living communities!</strong> &nbsp;
-  <a href="https://github.com/Mohammad-Aker/GreenThumb"><strong>  Explore the docs »</strong></a>
+  <a href="https://github.com/Mohammad-Aker/GreenThumb"><strong>  Check out the documentation »</strong></a>
 </div>
 <br>
 <div align="center">
