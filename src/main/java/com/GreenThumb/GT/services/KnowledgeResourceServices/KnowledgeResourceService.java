@@ -40,7 +40,6 @@ public class KnowledgeResourceService {
     }
 
 
-    //get resource by title
     public Optional<KnowledgeResource> getResourcesByTitle(String title) {
         try {
             return knowledgeResourceRepository.findByTitle(title);
