@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/rating")
+@RequestMapping("GreenThumb/api/ratings")
 public class ResourceRatingController {
 
     private final ResourceRatingService resourceRatingService;
@@ -68,7 +68,7 @@ public class ResourceRatingController {
 
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/ratings")
+    @GetMapping("/view-ratings")
     public ResponseEntity<List<ResourceRatingResponse>> getRatingsForResource(@RequestParam String title) {
         List<ResourceRatingResponse> ratingsResponse = resourceRatingService.getRatingsForResource(title);
         return ResponseEntity.ok(ratingsResponse);

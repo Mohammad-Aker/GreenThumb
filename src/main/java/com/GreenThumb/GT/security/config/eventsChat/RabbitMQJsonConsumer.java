@@ -1,5 +1,7 @@
-package com.GreenThumb.GT.eventsChat;
+package com.GreenThumb.GT.security.config.eventsChat;
 
+import com.GreenThumb.GT.DTO.Message;
+import com.GreenThumb.GT.services.MessageStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ public class RabbitMQJsonConsumer {
         this.messageStorageService = messageStorageService;
     }
 
-    public void consumeJsonMessage(com.GreenThumb.GT.eventsChat.Message message) {
+    public void consumeJsonMessage(Message message) {
         LOGGER.info(String.format("Received JSON message -> %s", message.toString()));
         messageStorageService.saveMessage(message.getEventName(), message);
     }

@@ -30,7 +30,7 @@ import java.util.*;
 
 @RestController
 //@PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping("/GreenThumb/api/learningResources")
+@RequestMapping("/GreenThumb/api/learning-resources")
 public class KnowledgeResourceController {
 
     private final KnowledgeResourceService knowledgeResourceService;
@@ -43,19 +43,13 @@ public class KnowledgeResourceController {
     }
 
 
-
-    //////////////////////////////////////////////////////// get /////////////////////////////////////////////////////
-    //get all resources
-    //all checked
-    //the response is good , the auth available for all
-    @GetMapping("/allResources")
+    @GetMapping("/get-all")
     @JsonView(Views.Public.class)
     public ResponseEntity<List<KnowledgeResource>> getAllResources() {
         return ResponseEntity.ok(knowledgeResourceService.getAllResources());
     }
 
 
-    //there is error handling if resource not found, works properly
     @GetMapping("/search")
     @JsonView(Views.Public.class)  // Apply the Public view to only serialize fields included in the Public view
     public ResponseEntity<?> getResourceByTitle(@RequestParam String title) {
@@ -71,7 +65,6 @@ public class KnowledgeResourceController {
 
 
 
-    //works properly
     @JsonView(Views.Public.class)
     @GetMapping("/sort")
     public List<KnowledgeResource> sortResources(@RequestParam(required = false) String sortField,
@@ -82,7 +75,6 @@ public class KnowledgeResourceController {
 
 
 
-    //works properly
     @GetMapping("/filter")
     @JsonView(Views.Public.class)
     public ResponseEntity<List<KnowledgeResource>> filterResources(
@@ -97,18 +89,6 @@ public class KnowledgeResourceController {
     }
 
 
-
-
-
-    //////////////////////////////////////////////////////// add create ////////////////////////////////////////////////
-//    @PostMapping("/upload")
-//    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-//        try {
-//            return ResponseEntity.ok(knowledgeResourceService.storeFile(file));
-//        } catch (IOException e) {
-//            return ResponseEntity.internalServerError().body("Failed to store file.");
-//        }
-//    }
 
     @GetMapping("/download/{title}")
     public ResponseEntity<String> downloadFile(@PathVariable String title) {
@@ -155,8 +135,6 @@ public class KnowledgeResourceController {
 
 
     @PreAuthorize("hasAuthority('EXPERT')")
-    //auth done
-    //it enables adding tags only to the expert who submitted the resource ?
     @JsonView(Views.Public.class)
     @PutMapping("/{title}/tags")
     public ResponseEntity<?> addTags(@AuthenticationPrincipal User user, @PathVariable String title, @RequestBody Set<String> tags) {
@@ -174,7 +152,6 @@ public class KnowledgeResourceController {
         }
     }
 
-    /////////////////////////////////////////////// update //////////////////////////////////////////////////
     @PreAuthorize("hasAuthority('EXPERT')")
     @JsonView(Views.Public.class)
     @PatchMapping("/update")
@@ -193,7 +170,6 @@ public class KnowledgeResourceController {
                     .body("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
-    /////////////////////////////////////////////////////// delete ///////////////////////////////////////////////////
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('EXPERT')")
     @DeleteMapping("/deleteByTitle")

@@ -23,26 +23,32 @@ public class CommunityGardenService {
     private UserCommunityGardenRepository userCommunityGardenRepository;
 
 
-    @PreAuthorize("hasAnyRole('USER', 'EXPERT', 'ADMIN')")
-    public List<CommunityGarden> getAllGardens() {
+
+    public List<CommunityGarden> getAllApprovedGardens() {
         return communityGardenRepository.findAll().stream()
                 .filter(garden -> garden.getStatus() == GardenStatus.APPROVED)
                 .collect(Collectors.toList());
     }
 
-    //@PreAuthorize("hasAnyRole('USER', 'EXPERT', 'ADMIN')")
+    public List<CommunityGarden> getAllGardens() {
+        return communityGardenRepository.findAll();
+    }
+
+    public List<CommunityGarden> getAllPendingGardens() {
+        return communityGardenRepository.findAll().stream()
+                .filter(garden -> garden.getStatus() == GardenStatus.PENDING)
+                .collect(Collectors.toList());
+    }
     public Optional<CommunityGarden> getGardenById(Long id) {
         Optional<CommunityGarden> garden = communityGardenRepository.findById(id);
         return garden.filter(g -> g.getStatus() == GardenStatus.APPROVED);
     }
 
-    //@PreAuthorize("hasAnyRole('USER', 'EXPERT')")
     public CommunityGarden createGarden(CommunityGarden communityGarden) {
         communityGarden.setStatus(GardenStatus.PENDING); // Set status to pending
         return communityGardenRepository.save(communityGarden);
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'EXPERT')")
     public CommunityGarden updateGarden(Long id, CommunityGarden communityGardenDetails) {
         return communityGardenRepository.findById(id).map(garden -> {
             garden.setName(communityGardenDetails.getName());
@@ -59,12 +65,10 @@ public class CommunityGardenService {
         });
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'EXPERT')")
     public void deleteGarden(Long id) {
         communityGardenRepository.deleteById(id);
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
     public CommunityGarden approveGarden(Long id) {
         return communityGardenRepository.findById(id).map(garden -> {
             garden.setStatus(GardenStatus.APPROVED);
@@ -72,7 +76,6 @@ public class CommunityGardenService {
         }).orElseThrow(() -> new RuntimeException("Garden not found"));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public CommunityGarden rejectGarden(Long id) {
         return communityGardenRepository.findById(id).map(garden -> {
             garden.setStatus(GardenStatus.REJECTED);
@@ -86,14 +89,12 @@ public class CommunityGardenService {
         UserCommunityGarden userCommunityGarden = (UserCommunityGarden) userCommunityGardenRepository.findByUserEmailAndCommunityGardenId(userEmail, gardenId)
                 .orElseThrow(() -> new IllegalArgumentException("UserCommunityGarden not found for user " + userEmail + " in garden " + gardenId));
 
-        // Delete the association
         userCommunityGardenRepository.delete(userCommunityGarden);
     }
 
 
-    //@PreAuthorize("hasAnyRole('USER', 'EXPERT')")
     public void joinGarden(Long gardenId, UserCommunityGarden userCommunityGarden) {
-        CommunityGarden garden = communityGardenRepository.findById(gardenId)
+        CommunityGarden garden = communityGardenRepository.findCommunityGardenByIdAndStatus(gardenId,GardenStatus.APPROVED)
                 .orElseThrow(() -> new IllegalArgumentException("Community Garden not found with id: " + gardenId));
         userCommunityGarden.setCommunityGarden(garden);
         userCommunityGardenRepository.save(userCommunityGarden);

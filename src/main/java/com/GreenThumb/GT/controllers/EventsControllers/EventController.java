@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping("GreenThumb/api/events")
 public class EventController {
 
     @Autowired
@@ -35,9 +35,8 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('REPRESENTATIVE')")
-    //public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail) {
     public ResponseEntity<Events> createEvent(@RequestBody Events event, @RequestParam String userEmail, @RequestParam Long partnerId) {
         try {
             Events createdEvent = eventService.createEvent(event, userEmail, partnerId);

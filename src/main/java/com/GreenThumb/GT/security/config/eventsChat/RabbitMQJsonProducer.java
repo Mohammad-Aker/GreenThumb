@@ -1,5 +1,6 @@
-package com.GreenThumb.GT.eventsChat;
+package com.GreenThumb.GT.security.config.eventsChat;
 
+import com.GreenThumb.GT.DTO.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

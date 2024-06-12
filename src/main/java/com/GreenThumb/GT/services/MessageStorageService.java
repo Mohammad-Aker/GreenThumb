@@ -1,5 +1,6 @@
-package com.GreenThumb.GT.eventsChat;
+package com.GreenThumb.GT.services;
 
+import com.GreenThumb.GT.DTO.Message;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

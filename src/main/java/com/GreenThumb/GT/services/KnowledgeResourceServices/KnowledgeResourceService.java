@@ -39,9 +39,6 @@ public class KnowledgeResourceService {
     }
 
 
-    ///////////////////////////////////////////// get  /////////////////////////////////////////////////
-
-    //get all resources
     public List<KnowledgeResource> getAllResources() {
         return knowledgeResourceRepository.findAll();
     }

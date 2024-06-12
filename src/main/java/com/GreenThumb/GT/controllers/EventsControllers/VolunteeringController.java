@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/volunteering")
+@RequestMapping("GreenThumb/api/volunteering")
 public class VolunteeringController {
 
     @Autowired
@@ -38,24 +38,12 @@ public class VolunteeringController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/deleteExpired")
+    @PostMapping("/delete-expired")
     public ResponseEntity<Void> deleteExpiredVolunteeringRecords() {
         volunteeringService.deleteExpiredVolunteeringRecords();
         return ResponseEntity.ok().build();
     }
-    /*@PostMapping("/join")
-    public ResponseEntity<Volunteering> joinEvent(@AuthenticationPrincipal User user,
-                                                  @RequestParam Long eventId,
-                                                  @RequestParam String role,
-                                                  @RequestParam String tasks,
-                                                  @RequestParam int hoursVolunteered,
-                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                                  @RequestParam String status,
-                                                  @RequestParam(required = false) String notes) {
-        Volunteering volunteering = volunteeringService.joinEventWithVolDetails(user, eventId, role, tasks, hoursVolunteered, startDate, endDate, status, notes);
-        return ResponseEntity.ok(volunteering);
-    }*/
+
     @PostMapping("/{eventId}/join")
     public ResponseEntity<Volunteering> joinEvent(@PathVariable Long eventId,@RequestBody Volunteering volunteering) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

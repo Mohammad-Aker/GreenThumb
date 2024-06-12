@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.controllers.ResourceExchangeControllers;
+package com.GreenThumb.GT.controllers.MaterialExchangeControllers;
 
 import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ExchangeDTO;
 import com.GreenThumb.GT.models.User.User;
@@ -20,14 +20,14 @@ public class ExchangeController {
     @Autowired
     private ExchangeService exchangeService;
 
-    @GetMapping
+    @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER') or hasAuthority('EXPERT')")
     public ResponseEntity<List<ExchangeDTO>> getAllExchanges() {
         List<ExchangeDTO> exchanges = exchangeService.getAllExchanges();
         return ResponseEntity.ok(exchanges);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('EXPERT')")
     public ResponseEntity<ExchangeDTO> createExchange(@RequestBody ExchangeDTO exchangeDTO, @AuthenticationPrincipal User user) {
         // Extract the resource owner and request user

@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.eventsChat;
+package com.GreenThumb.GT.security.config.eventsChat;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;

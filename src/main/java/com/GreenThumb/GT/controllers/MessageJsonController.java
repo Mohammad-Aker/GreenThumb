@@ -1,5 +1,8 @@
-package com.GreenThumb.GT.eventsChat;
+package com.GreenThumb.GT.controllers;
 
+import com.GreenThumb.GT.DTO.Message;
+import com.GreenThumb.GT.services.MessageStorageService;
+import com.GreenThumb.GT.security.config.eventsChat.RabbitMQJsonProducer;
 import com.GreenThumb.GT.exceptions.UserNotAuthorizedException;
 import com.GreenThumb.GT.models.Events.Events;
 import com.GreenThumb.GT.models.Events.Volunteering;

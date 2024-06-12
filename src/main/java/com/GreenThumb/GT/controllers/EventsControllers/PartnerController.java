@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/partners")
+@RequestMapping("GreenThumb/api/partners")
 public class PartnerController {
 
     @Autowired
@@ -20,13 +20,13 @@ public class PartnerController {
         return partnerService.getAllPartners();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/view/{id}")
     public ResponseEntity<Partner> getPartnerById(@PathVariable Long id) {
         Optional<Partner> partner = partnerService.getPartnerById(id);
         return partner.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deletePartner(@PathVariable Long id) {
         partnerService.deletePartner(id);
         return ResponseEntity.ok().build();

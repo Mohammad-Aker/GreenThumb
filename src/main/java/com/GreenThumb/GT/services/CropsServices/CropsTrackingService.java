@@ -41,10 +41,6 @@ public class CropsTrackingService {
 
 
 
-
-    //CORE FEATURE - 2 -
-
-    // ******** User access to modify planting and harvesting Dates.
     public void schedulePlanting(String userEmail, Long cropId, Date plantingDate) {
         cropsTrackingRepository.schedulePlanting(userEmail, cropId, plantingDate);
     }

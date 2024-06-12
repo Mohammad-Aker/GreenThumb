@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/detection")
+@RequestMapping("GreenThumb/api/pest-detection")
 public class PestDetectionController {
 
     @Autowired
@@ -61,7 +61,7 @@ public class PestDetectionController {
     }
 
 
-    @PostMapping("/handlePest")
+    @PostMapping("/handle-pest")
     public ResponseEntity<String> chatWithPestIdentification(@RequestParam("file") MultipartFile file) {
         try {
             // Detect the object
@@ -72,14 +72,13 @@ public class PestDetectionController {
                 return ResponseEntity.ok("No pest detected.");
             }
 
-            // Prepare the chat prompt
+            // openai prompt
             String prompt = "I have this pest (" + className + ") in my garden, tell me how to deal with it and take my precautions with my crops";
             ChatRequest request = new ChatRequest(model, prompt);
 
-            // Make the API call and return the raw response as plain text
+            // make the api call, return result as plain text
             ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
 
-            // Check response status and return body directly
             if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
                 return ResponseEntity.ok(response.getBody());
             } else {

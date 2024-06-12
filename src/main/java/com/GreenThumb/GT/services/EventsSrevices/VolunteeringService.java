@@ -56,27 +56,5 @@ public class VolunteeringService {
         volunteeringRepository.save(volunteering);
 
     }
-    /*public void joinEventWithVolDetails(User user, Long eventId, String role, String tasks, int hoursVolunteered,
-                                        LocalDate startDate, LocalDate endDate, String status, String notes) {
 
-        Events events = eventsRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Community Garden not found with id: " + eventId));
-        Volunteering volunteering = Volunteering.builder()
-                .user(user)
-                .event(eventId)
-                .role(role)
-                .tasks(tasks)
-                .hoursVolunteered(hoursVolunteered)
-                .startDate(startDate)
-                .endDate(endDate)
-                .status(status)
-                .notes(notes)
-                .build();
-
-        return volunteeringRepository.save(volunteering);) {
-
-        volunteering.setEvent(events);
-        volunteeringRepository.save(volunteering);
-
-    }*/
 }

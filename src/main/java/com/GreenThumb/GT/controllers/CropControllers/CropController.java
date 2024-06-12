@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/crops")
+@RequestMapping("GreenThumb/api/crops")
 public class CropController {
 
+    @Autowired
     private CropService cropService;
 
     @Autowired
@@ -19,7 +20,7 @@ public class CropController {
         this.cropService = cropService;
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/get-all")
     public ResponseEntity<List<Crop>> getAllCrops() {
         return ResponseEntity.ok(cropService.getAllCrops());
     }

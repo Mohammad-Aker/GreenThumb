@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.controllers.ResourceExchangeControllers;
+package com.GreenThumb.GT.controllers.MaterialExchangeControllers;
 
 import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceRequestDTO;
 import com.GreenThumb.GT.exceptions.InvalidRequestException;
@@ -17,19 +17,19 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("GreenThumb/api/requests")
-public class ResourceRequestController {
+public class MaterialRequestController {
 
     @Autowired
     private ResourceRequestService service;
 
-    @GetMapping
+    @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('EXPERT')")
     public ResponseEntity<List<ResourceRequestDTO>> getAllRequests(@AuthenticationPrincipal User user) {
         List<ResourceRequestDTO> requests = service.getAllRequests(user.getEmail());
         return ResponseEntity.ok(requests);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('EXPERT')")
     public ResponseEntity<?> createRequest(@RequestBody ResourceRequestDTO requestDTO, @AuthenticationPrincipal User user) {
         try {

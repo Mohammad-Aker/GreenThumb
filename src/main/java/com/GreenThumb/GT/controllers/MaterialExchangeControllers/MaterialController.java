@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.controllers.ResourceExchangeControllers;
+package com.GreenThumb.GT.controllers.MaterialExchangeControllers;
 
 import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceCreationDTO;
 import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceDTO;
@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("GreenThumb/api/resources")
-public class ResourceController {
+public class MaterialController {
 
     @Autowired
     private ResourceService service;
 
-    @GetMapping
+    @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('USER')or hasAuthority('ADMIN')")
     public ResponseEntity<?> getResources(
             @AuthenticationPrincipal User user,
@@ -67,7 +67,7 @@ public class ResourceController {
 
 
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER')or hasAuthority('EXPERT')")
     public ResponseEntity<String> addResource(
             @RequestBody ResourceCreationDTO resourceDto,

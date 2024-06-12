@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.eventsChat;
+package com.GreenThumb.GT.DTO;
 
 import lombok.Data;
 
