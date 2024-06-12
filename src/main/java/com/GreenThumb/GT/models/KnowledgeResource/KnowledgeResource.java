@@ -3,10 +3,12 @@ package com.GreenThumb.GT.models.KnowledgeResource;
 import com.GreenThumb.GT.models.ResourceRating.ResourceRating;
 import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.Views;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -26,11 +28,13 @@ public class KnowledgeResource {
     @JsonView(Views.Public.class)
     private String title;
 
-    @NotBlank
-    @JsonView(Views.Public.class)
-    @Lob
-    private byte[] data;
 
+    @NotNull
+    @JsonView(Views.Public.class)
+    @JsonIgnore
+    @Lob
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] data;
 
 
     @ManyToOne
@@ -41,11 +45,6 @@ public class KnowledgeResource {
 
     @JsonView(Views.Public.class)
     private String author;
-
-
-    @Enumerated(EnumType.STRING)
-    @JsonView(Views.Public.class)
-    private ResourceType type;
 
 
     @Enumerated(EnumType.STRING)

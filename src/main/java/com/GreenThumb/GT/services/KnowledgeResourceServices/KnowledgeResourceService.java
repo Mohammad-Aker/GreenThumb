@@ -5,20 +5,16 @@ import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
 
 
-import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
 import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
 import com.GreenThumb.GT.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,17 +53,20 @@ public class KnowledgeResourceService {
 
 
     public List<KnowledgeResource> sortResources(String sortField, String sortDirection) {
-        Sort sort = Sort.unsorted();
-        if (sortField != null && !sortField.isEmpty() && sortDirection != null && !sortDirection.isEmpty()) {
-            Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-            sort = Sort.by(new Sort.Order(direction, sortField));
+        try {
+            Sort sort = Sort.unsorted();
+            if (sortField != null && !sortField.isEmpty() && sortDirection != null && !sortDirection.isEmpty()) {
+                Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());  // Handle case sensitivity
+                sort = Sort.by(new Sort.Order(direction, sortField));
+            }
+            return knowledgeResourceRepository.findAll(sort);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid sort field or direction");
         }
-
-        return knowledgeResourceRepository.findAll(sort);
     }
 
 
-    public List<KnowledgeResource> filterResources(String author, String type, Set<String> tags, Double averageRating, ResourceCategory category) {
+    public List<KnowledgeResource> filterResources(String author, Set<String> tags, Double averageRating, ResourceCategory category) {
         // Start with all resources, then filter down
         List<KnowledgeResource> resources = knowledgeResourceRepository.findAll();
 
@@ -78,12 +77,6 @@ public class KnowledgeResourceService {
                     .collect(Collectors.toList());
         }
 
-        // Filter by type if specified
-        if (type != null && !type.isEmpty()) {
-            resources = resources.stream()
-                    .filter(resource -> type.equals(resource.getType().name()))  // Assuming type is a String representation of the enum
-                    .collect(Collectors.toList());
-        }
 
         // Filter by averageRating if specified
         if (averageRating != null) {
@@ -110,28 +103,32 @@ public class KnowledgeResourceService {
     }
 
     ////////////////////////////////////////// add or create //////////////////////////////////////////////////
-//   public KnowledgeResource createResource(KnowledgeResourceDTO resourceDTO, String userEmail) {
-//        if (knowledgeResourceRepository.existsByTitle(resourceDTO.getTitle())) {
-//            throw new IllegalStateException("Resource with the given title already exists.");
-//        }
-//
-//        if (knowledgeResourceRepository.existsByContentUrl(resourceDTO.getContentUrl())) {
-//            throw new IllegalStateException("Resource with the given content URL already exists.");
-//        }
-//
-//        // Assuming you've mapped ResourceDTO to KnowledgeResource entity correctly
-//        KnowledgeResource resource = new KnowledgeResource();
-//        resource.setTitle(resourceDTO.getTitle());
-/////
-//        resource.setType(resourceDTO.getType());
-//        resource.setCategory(resourceDTO.getCategory());
-//        resource.setTags(resourceDTO.getTags());
-//        resource.setAuthor(resourceDTO.getAuthor());
-//        resource.setUser(userRepository.findByEmail(userEmail)
-//                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail)));
-//
-//        return knowledgeResourceRepository.save(resource);
-//    }
+
+
+
+    public String storeFile(MultipartFile file, KnowledgeResourceDTO knowledgeResourceDTO) throws IOException {
+
+        // Check if the document already exists
+        Optional<KnowledgeResource> existingResource = knowledgeResourceRepository.findByTitle(knowledgeResourceDTO.getTitle());
+        if (existingResource.isPresent()) {
+            throw new DataIntegrityViolationException("Resource with the title '" + knowledgeResourceDTO.getTitle() + "' already exists.");
+        }
+        KnowledgeResource document = new KnowledgeResource();
+        //document.setTitle(file.getOriginalFilename());
+        document.setTitle(knowledgeResourceDTO.getTitle());
+        document.setData(file.getBytes());
+        document.setAuthor(knowledgeResourceDTO.getAuthor());
+        document.setCategory(knowledgeResourceDTO.getCategory());
+        document.setCreatedDate(new Date());
+        document.setUser(userRepository.findByEmail(knowledgeResourceDTO.getUserEmail())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + knowledgeResourceDTO.getUserEmail())));
+
+        knowledgeResourceRepository.save(document);
+        return "File stored successfully!";
+
+
+}
+
 
 
     public KnowledgeResource addTags(String title, Set<String> newTags, String currentUserEmail) {
@@ -168,12 +165,12 @@ public class KnowledgeResourceService {
 /////////////////////////////////////////////// update //////////////////////////////////////////////////
 
 
-    public KnowledgeResource updateResource(String currentTitle, String currentUserEmail,
-                                            String newTitle, String author, ResourceType type,
+    public KnowledgeResource updateResource(String title, String currentUserEmail,
+                                            String author,
                                             ResourceCategory category, Set<String> tags) {
-        Optional<KnowledgeResource> resourceOptional = knowledgeResourceRepository.findByTitle(currentTitle);
+        Optional<KnowledgeResource> resourceOptional = knowledgeResourceRepository.findByTitle(title);
         if (!resourceOptional.isPresent()) {
-            throw new IllegalArgumentException("No resource found with title: " + currentTitle);
+            throw new IllegalArgumentException("No resource found with title: " + title);
         }
 
         KnowledgeResource existingResource = resourceOptional.get();
@@ -181,39 +178,16 @@ public class KnowledgeResourceService {
             throw new SecurityException("You are not authorized to update this resource.");
         }
 
-        if (newTitle != null && !newTitle.isEmpty() && !newTitle.equals(currentTitle)) {
-            if (knowledgeResourceRepository.findByTitle(newTitle).isPresent()) {
-                throw new IllegalArgumentException("A resource with the new title '" + newTitle + "' already exists.");
-            }
-            existingResource.setTitle(newTitle);
-        }
 
         // Update other fields as necessary
-       // if (content != null) existingResource.setContentUrl(content);
         if (author != null) existingResource.setAuthor(author);
-        if (type != null) existingResource.setType(type);
         if (category != null) existingResource.setCategory(category);
-        if (tags != null && !tags.isEmpty()) existingResource.setTags(new HashSet<>(tags)); // ensure tags are updated properly
+        if (tags != null && !tags.isEmpty()) existingResource.setTags(new HashSet<>(tags));
 
         return knowledgeResourceRepository.save(existingResource);
     }
 
     ////////////////////////////////////// delete ////////////////////////////////////////
-/*
-    public void deleteResource(String title, String userEmail) throws ResourceNotFoundException, UnauthorizedException {
-        Optional<KnowledgeResource> resource = knowledgeResourceRepository.findByTitle(title);
-        if (!resource.isPresent()) {
-            throw new ResourceNotFoundException("Resource not found with title: " + title);
-        }
-
-        KnowledgeResource existingResource = resource.get();
-        if (existingResource.getUser().getEmail().equals(userEmail) || existingResource.getUser().getRole().name().equals("ADMIN")) {
-            knowledgeResourceRepository.delete(existingResource);
-        } else {
-            throw new UnauthorizedException("You are not authorized to delete this resource.");
-        }
-
-    }*/
 
     public void deleteResource(String title, String userEmail, String userRole) throws ResourceNotFoundException, UnauthorizedException {
         try {
@@ -236,7 +210,7 @@ public class KnowledgeResourceService {
         }
     }
 
-    //for admin
+
     public boolean deleteResourcesByCategory(ResourceCategory category) {
         List<KnowledgeResource> resources = knowledgeResourceRepository.findByCategory(category);
         if (resources == null || resources.isEmpty()) {
@@ -247,24 +221,5 @@ public class KnowledgeResourceService {
         return true; // Resources were deleted
     }
 
-///////////////////////////////////////// Download ///////////////////////////////////////////
 
-
-
-
-
-    public String storeFile(MultipartFile file, KnowledgeResourceDTO knowledgeResourceDTO) throws IOException {
-        KnowledgeResource document = new KnowledgeResource();
-        document.setTitle(file.getOriginalFilename());
-        document.setData(file.getBytes());
-        document.setAuthor(knowledgeResourceDTO.getAuthor());
-        document.setType(knowledgeResourceDTO.getType());
-        document.setCategory(knowledgeResourceDTO.getCategory());
-        document.setCreatedDate(new Date());
-        document.setUser(userRepository.findByEmail(knowledgeResourceDTO.getUserEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + knowledgeResourceDTO.getUserEmail())));
-
-        knowledgeResourceRepository.save(document);
-        return "File stored successfully!";
-    }
 }
