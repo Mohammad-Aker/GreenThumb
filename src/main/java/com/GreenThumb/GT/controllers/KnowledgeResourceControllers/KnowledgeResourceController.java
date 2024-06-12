@@ -4,20 +4,18 @@ import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.KnowledgeResourceDTO;
 import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
-import com.GreenThumb.GT.models.KnowledgeResource.ResourceType;
 import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.Views;
 import com.GreenThumb.GT.repositories.KnowledgeResourceRepositories.KnowledgeResourceRepository;
 import com.GreenThumb.GT.services.KnowledgeResourceServices.KnowledgeResourceService;
 import com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingService;
 import com.fasterxml.jackson.annotation.JsonView;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,17 +43,22 @@ public class KnowledgeResourceController {
 
 
     //////////////////////////////////////////////////////// get /////////////////////////////////////////////////////
-    //get all resources
-    //all checked
-    //the response is good , the auth available for all
+
     @GetMapping("/allResources")
     @JsonView(Views.Public.class)
-    public ResponseEntity<List<KnowledgeResource>> getAllResources() {
-        return ResponseEntity.ok(knowledgeResourceService.getAllResources());
+    public ResponseEntity<?> getAllResources() {
+        try {
+            List<KnowledgeResource> resources = knowledgeResourceService.getAllResources();
+            if (resources.isEmpty()) {
+                return ResponseEntity.noContent().build(); // Return 204 No Content when no resources are found
+            }
+            return ResponseEntity.ok(resources); // Return 200 OK with the list of resources
+        } catch (Exception e) {
+            // Log the exception details here if logging is configured
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while retrieving resources: " + e.getMessage());
+        }
     }
 
-
-    //there is error handling if resource not found, works properly
     @GetMapping("/search")
     @JsonView(Views.Public.class)  // Apply the Public view to only serialize fields included in the Public view
     public ResponseEntity<?> getResourceByTitle(@RequestParam String title) {
@@ -69,53 +72,13 @@ public class KnowledgeResourceController {
         return ResponseEntity.ok(resource.get());
     }
 
-
-
-    //works properly
-    @JsonView(Views.Public.class)
-    @GetMapping("/sort")
-    public List<KnowledgeResource> sortResources(@RequestParam(required = false) String sortField,
-                                                 @RequestParam(required = false) String sortDirection) {
-        return knowledgeResourceService.sortResources(sortField, sortDirection);
-    }
-
-
-
-
-    //works properly
-    @GetMapping("/filter")
-    @JsonView(Views.Public.class)
-    public ResponseEntity<List<KnowledgeResource>> filterResources(
-            @RequestParam(required = false) String author,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) Set<String> tags,
-            @RequestParam(required = false) Double averageRating,
-            @RequestParam(required = false) ResourceCategory category) {
-
-        List<KnowledgeResource> filteredResources = knowledgeResourceService.filterResources(author, type, tags, averageRating, category);
-        return ResponseEntity.ok(filteredResources);
-    }
-
-
-
-
-
-    //////////////////////////////////////////////////////// add create ////////////////////////////////////////////////
-//    @PostMapping("/upload")
-//    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-//        try {
-//            return ResponseEntity.ok(knowledgeResourceService.storeFile(file));
-//        } catch (IOException e) {
-//            return ResponseEntity.internalServerError().body("Failed to store file.");
-//        }
-//    }
-
     @GetMapping("/download/{title}")
     public ResponseEntity<String> downloadFile(@PathVariable String title) {
         Optional<KnowledgeResource> documentOptional = knowledgeResourceRepository.findByTitle(title);
 
         if (!documentOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Resource with the title '" + title + "' not found.");
         }
 
         KnowledgeResource document = documentOptional.get();
@@ -131,32 +94,59 @@ public class KnowledgeResourceController {
     }
 
 
-
-
-
-      @PreAuthorize("hasAuthority('EXPERT')")
-    @PostMapping("/create")
-    public ResponseEntity<?> createResource(@Valid @RequestBody KnowledgeResourceDTO resourceDTO, @RequestParam("file") MultipartFile file) {
+    @JsonView(Views.Public.class)
+    @GetMapping("/sort")
+    public ResponseEntity<?> sortResources(@RequestParam String sortField,
+                                           @RequestParam String sortDirection) {
         try {
-            String createdResource = knowledgeResourceService.storeFile(file, resourceDTO);
-            return ResponseEntity.ok(createdResource);
-        } catch (IllegalStateException e) {
-            // Handle exceptions related to resource uniqueness
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            List<KnowledgeResource> resources = knowledgeResourceService.sortResources(sortField, sortDirection);
+            return ResponseEntity.ok(resources);
         } catch (IllegalArgumentException e) {
-            // Handle exceptions related to user existence or other argument issues
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/filter")
+    @JsonView(Views.Public.class)
+    public ResponseEntity<?> filterResources(
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) Set<String> tags,
+            @RequestParam(required = false) Double averageRating,
+            @RequestParam(required = false) ResourceCategory category) {
+
+        try {
+            List<KnowledgeResource> filteredResources = knowledgeResourceService.filterResources(author, tags, averageRating, category);
+            if (filteredResources.isEmpty()) {
+                return ResponseEntity.noContent().build(); // Respond with 204 No Content if no resources match the filters
+            }
+            return ResponseEntity.ok(filteredResources);
         } catch (Exception e) {
-            // Handle unexpected exceptions
-            return ResponseEntity.internalServerError().body("An error occurred while creating the resource.");
+            return ResponseEntity.badRequest().body("Error filtering resources: " + e.getMessage());
         }
     }
 
 
 
+
+    //////////////////////////////////////////////////////// add create ////////////////////////////////////////////////
     @PreAuthorize("hasAuthority('EXPERT')")
-    //auth done
-    //it enables adding tags only to the expert who submitted the resource ?
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadFile(@AuthenticationPrincipal User user,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("title") String title,
+            @RequestParam("author") String author,
+            @RequestParam("category") ResourceCategory category,
+            @RequestParam(value = "tags", required = false) Set<String> tags) throws IOException {
+
+
+            KnowledgeResourceDTO dto = new KnowledgeResourceDTO(title,user.getEmail(), author, category, tags);
+            String response = knowledgeResourceService.storeFile(file, dto);
+            return ResponseEntity.ok(response);
+
+    }
+
+
+    @PreAuthorize("hasAuthority('EXPERT')")
     @JsonView(Views.Public.class)
     @PutMapping("/{title}/tags")
     public ResponseEntity<?> addTags(@AuthenticationPrincipal User user, @PathVariable String title, @RequestBody Set<String> tags) {
@@ -179,14 +169,12 @@ public class KnowledgeResourceController {
     @JsonView(Views.Public.class)
     @PatchMapping("/update")
     public ResponseEntity<?> updateResource(@AuthenticationPrincipal User user,
-                                            @RequestParam String currentTitle,
-                                            @RequestParam(required = false) String newTitle,
+                                            @RequestParam String title,
                                             @RequestParam(required = false) String author,
-                                            @RequestParam(required = false) ResourceType type,
                                             @RequestParam(required = false) ResourceCategory category,
                                             @RequestParam(required = false) Set<String> tags) {
         try {
-            KnowledgeResource resource = knowledgeResourceService.updateResource(currentTitle, user.getEmail(), newTitle, author, type, category, tags);
+            KnowledgeResource resource = knowledgeResourceService.updateResource(title, user.getEmail(), author, category, tags);
             return ResponseEntity.ok(resource);
         } catch (IllegalArgumentException | SecurityException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -227,7 +215,6 @@ public class KnowledgeResourceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Generic error handling for other exceptions
         }
     }
-
 
 
 }

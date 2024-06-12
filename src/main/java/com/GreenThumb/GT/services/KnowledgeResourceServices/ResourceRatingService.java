@@ -157,16 +157,14 @@ public class ResourceRatingService {
 
     //the user can rate multiple times
     //the user can report a resource once
-    //the user can't rate after report or rate
-    //the expert can't rate or report his resources
+    //the user can't rate or report after report submission
+    //the expert can't rate or report his own resources
 
 
     ////////////////////////////////////////////// Get Ratings & Reports ///////////////////////////////////////////
 
 
     //for Admin
-
-    //test them
 
     public List<ResourceRatingResponse> getRatingsForResource(String resourceTitle) {
         List<ResourceRating> ratings = resourceRatingRepository.findByResource_Title(resourceTitle);
@@ -185,8 +183,6 @@ public class ResourceRatingService {
     }
 
 
-
-
     public List<ReportedResourceResponse> getReportedResources() {
         List<ResourceRating> reportedRatings = resourceRatingRepository.findByReportedTrue();
         return reportedRatings.stream()
@@ -197,7 +193,6 @@ public class ResourceRatingService {
                             .category(resource.getCategory())
                             .resourceTitle(resource.getTitle())
                             .author(resource.getAuthor())
-                            .type(resource.getType())
                           //  .content(resource.getContentUrl())
                             .reportDescription(rating.getReportDescription())
                             .build();
