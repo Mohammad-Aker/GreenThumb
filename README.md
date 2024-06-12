@@ -70,7 +70,7 @@
 ## 🐞 Additional Features
 <strong>1. Chat System: </strong>Events group chats enable volunteers and representatives to communicate within event-specific group chats in real-time , enhancing coordination and collaboration within the event community.<br>
 <strong>2. External API Integration: </strong> Utilized to enhance functionality and supplement data collection.<br>
-<strong>3. Testing: </strong> Guaranteeing a robust and stable platform for crafting project management.<br>
+<strong>3. Testing: </strong> Guaranteeing a robust and stable platform for community garden management<br>
 <strong>4. Docker: </strong> Simplifies software deployment by packaging applications into portable containers.<br>
  <br>
  <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
