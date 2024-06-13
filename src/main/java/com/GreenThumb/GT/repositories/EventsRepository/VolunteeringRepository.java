@@ -1,8 +1,6 @@
 package com.GreenThumb.GT.repositories.EventsRepository;
 
-import com.GreenThumb.GT.models.Events.*;
-import com.GreenThumb.GT.models.User.User;
-
+import com.GreenThumb.GT.models.Events.Volunteering;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +11,6 @@ import java.util.List;
 public interface VolunteeringRepository extends JpaRepository<Volunteering, Long> {
     List<Volunteering> findByEndDateBefore(LocalDate date);
     Volunteering findByUserEmailAndEventName(String userEmail, String eventName);
+
+    void deleteByEventId(Long id);
 }

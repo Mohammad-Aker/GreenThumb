@@ -36,7 +36,7 @@ public class Volunteering {
     @JoinColumn(name = "partner_id", nullable = true)
     private Partner partner;
 
-    @NotBlank
+
     private String role;
 
     @NotBlank

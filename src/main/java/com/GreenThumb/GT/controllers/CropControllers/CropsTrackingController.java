@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -27,6 +30,7 @@ public class CropsTrackingController {
     private final GeocodingService geocodingService;
     private final SoilService soilService;
 
+
     @Autowired
     public CropsTrackingController(CropsTrackingService cropsTrackingService, WeatherApiService weatherApiService, SoilDataService soilDataService, GeocodingService geocodingService, SoilService soilService) {
         this.cropsTrackingService = cropsTrackingService;
@@ -37,12 +41,14 @@ public class CropsTrackingController {
     }
 
     @GetMapping("/get-all")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
     public ResponseEntity<List<CropsTracking>> getAllCropsTracking() {
         List<CropsTracking> cropsTrackings = cropsTrackingService.getAllCropsTracking();
         return new ResponseEntity<>(cropsTrackings, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
     public ResponseEntity<CropsTracking> getCropsTrackingById(@PathVariable Long id) {
         return cropsTrackingService.getCropsTrackingById(id)
                 .map(cropsTracking -> new ResponseEntity<>(cropsTracking, HttpStatus.OK))
@@ -50,39 +56,55 @@ public class CropsTrackingController {
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
     public ResponseEntity<CropsTracking> saveCropsTracking(@RequestBody CropsTracking cropsTracking) {
         CropsTracking savedCropsTracking = cropsTrackingService.saveCropsTracking(cropsTracking);
         return new ResponseEntity<>(savedCropsTracking, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
     public ResponseEntity<?> deleteCropsTracking(@PathVariable Long id) {
         cropsTrackingService.deleteCropsTracking(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/planting/schedule/{userEmail}/{cropId}")
-    public void schedulePlanting(@PathVariable String userEmail, @PathVariable Long cropId, @RequestParam("plantingDate") @DateTimeFormat(pattern = "dd/MM/yyyy") Date plantingDate) {
+    @PutMapping("/planting/schedule/{cropId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
+    public void schedulePlanting(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId, @RequestParam("plantingDate") @DateTimeFormat(pattern = "dd/MM/yyyy") Date plantingDate) {
+        String userEmail = userDetails.getUsername(); // Retrieve authenticated user's email
+
         cropsTrackingService.schedulePlanting(userEmail, cropId, plantingDate);
     }
 
-    @PutMapping("/planting/{userEmail}/{cropId}")
-    public void recordActualPlanting(@PathVariable String userEmail, @PathVariable Long cropId, @RequestParam Date actualPlantingDate) {
+    @PutMapping("/planting/{cropId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
+    public void recordActualPlanting(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId, @RequestParam Date actualPlantingDate) {
+        String userEmail = userDetails.getUsername();
         cropsTrackingService.recordActualPlanting(userEmail, cropId, actualPlantingDate);
     }
 
-    @PutMapping("/harvest/schedule/{userEmail}/{cropId}")
-    public void scheduleHarvesting(@PathVariable String userEmail, @PathVariable Long cropId, @RequestParam("harvestingDate") @DateTimeFormat(pattern = "dd/MM/yyyy") Date harvestingDate) {
+
+    @PutMapping("/harvest/schedule/{cropId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
+    public void scheduleHarvesting(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId, @RequestParam("harvestingDate") @DateTimeFormat(pattern = "dd/MM/yyyy") Date harvestingDate) {
+        String userEmail = userDetails.getUsername();
         cropsTrackingService.scheduleHarvesting(userEmail, cropId, harvestingDate);
     }
 
-    @PutMapping("/harvesting/{userEmail}/{cropId}")
-    public void recordActualHarvesting(@PathVariable String userEmail, @PathVariable Long cropId, @RequestParam Date actualHarvestDate) {
+
+    @PutMapping("/harvesting/{cropId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
+    public void recordActualHarvesting(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId, @RequestParam Date actualHarvestDate) {
+        String userEmail = userDetails.getUsername(); // Retrieve authenticated user's email
         cropsTrackingService.recordActualHarvesting(userEmail, cropId, actualHarvestDate);
     }
 
-    @GetMapping("/rotations/{userEmail}/{cropId}")
-    public ResponseEntity<String> getCropRotationNotes(@PathVariable String userEmail, @PathVariable Long cropId) {
+
+    @GetMapping("/rotations/{cropId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
+    public ResponseEntity<String> getCropRotationNotes(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId) {
+        String userEmail = userDetails.getUsername(); // Retrieve authenticated user's email
         String rotationNotes = cropsTrackingService.findRotationNotesByUserEmailAndCropId(userEmail, cropId);
         if (rotationNotes != null) {
             return new ResponseEntity<>(rotationNotes, HttpStatus.OK);
@@ -91,14 +113,20 @@ public class CropsTrackingController {
         }
     }
 
-    @GetMapping("/harvest-records/{userEmail}")
-    public ResponseEntity<List<Object[]>> getCropsAndHarvestedQuantityByUser(@PathVariable String userEmail) {
+
+    @GetMapping("/harvest-records")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
+    public ResponseEntity<List<Object[]>> getCropsAndHarvestedQuantityByUser(@AuthenticationPrincipal UserDetails userDetails) {
+        String userEmail = userDetails.getUsername(); // Retrieve authenticated user's email
         List<Object[]> cropsAndQuantities = cropsTrackingService.getCropsAndHarvestedQuantityByUser(userEmail);
         return new ResponseEntity<>(cropsAndQuantities, HttpStatus.OK);
     }
 
-    @GetMapping("/weather/{userEmail}/{cropId}")
-    public ResponseEntity<String> getWeatherForCrop(@PathVariable String userEmail, @PathVariable Long cropId) {
+
+    @GetMapping("/weather/{cropId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
+    public ResponseEntity<String> getWeatherForCrop(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId) {
+        String userEmail = userDetails.getUsername(); // Retrieve authenticated user's email
         String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
         if (location != null) {
             try {
@@ -113,8 +141,10 @@ public class CropsTrackingController {
         }
     }
 
-    @GetMapping("/geocode/{userEmail}/{cropId}")
-    public ResponseEntity<Map<String, Float>> geocodeAddress(@PathVariable String userEmail, @PathVariable Long cropId) {
+
+    @GetMapping("/geocode/{cropId}")
+    public ResponseEntity<Map<String, Float>> geocodeAddress(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId) {
+        String userEmail = userDetails.getUsername(); // Retrieve authenticated user's email
         try {
             String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
             if (location == null) {
@@ -128,8 +158,10 @@ public class CropsTrackingController {
         }
     }
 
-    @GetMapping("/soil-data/{userEmail}/{cropId}")
-    public ResponseEntity<Map<String, Object>> getSoilData(@PathVariable String userEmail, @PathVariable Long cropId) {
+    @GetMapping("/soil-data/{cropId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
+    public ResponseEntity<Map<String, Object>> getSoilData(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId) {
+        String userEmail = userDetails.getUsername(); // Retrieve authenticated user's email
         try {
             String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
             if (location == null) {
@@ -146,7 +178,9 @@ public class CropsTrackingController {
         }
     }
 
+
     @GetMapping("/soil/{userEmail}/{cropId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
     public ResponseEntity<Map<String, Object>> getSoil(@PathVariable String userEmail, @PathVariable Long cropId) {
         try {
             String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);

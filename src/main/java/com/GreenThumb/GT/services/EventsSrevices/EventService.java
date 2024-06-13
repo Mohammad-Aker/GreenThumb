@@ -1,7 +1,6 @@
 package com.GreenThumb.GT.services.EventsSrevices;
 
 import com.GreenThumb.GT.models.Events.Events;
-import com.GreenThumb.GT.models.Events.Partner;
 import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.repositories.EventsRepository.EventRepository;
 import com.GreenThumb.GT.repositories.EventsRepository.PartnerRepository;
@@ -40,11 +39,9 @@ public class EventService {
         eventRepository.deleteById(id);
     }
 
-    public Events createEvent(Events event, String userEmail, Long partnerId) {
+    public Events createEvent(Events event, String userEmail) {
         Optional<User> userOpt = userRepository.findByEmail(userEmail);
         if (userOpt.isPresent() && userOpt.get().isRepresentative()) {
-            Optional<Partner> partnerOpt = partnerRepository.findById(partnerId);
-            partnerOpt.ifPresent(event::setPartner);
             return eventRepository.save(event);
         } else {
             throw new IllegalArgumentException("User does not have permission to create events.");
