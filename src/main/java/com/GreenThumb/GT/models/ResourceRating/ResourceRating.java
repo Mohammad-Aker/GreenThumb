@@ -11,7 +11,7 @@ import java.util.Date;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "resource_rating")
+@Table(name = "material_rating")
 public class ResourceRating {
 
     @Id

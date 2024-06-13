@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.DTO.ResourceExchangeDTO;
+package com.GreenThumb.GT.DTO.MaterialExchangeDTO;
 
 import com.GreenThumb.GT.Views.Views;
 import com.GreenThumb.GT.models.User.Role;

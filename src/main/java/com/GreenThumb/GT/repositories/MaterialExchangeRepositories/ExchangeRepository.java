@@ -1,6 +1,6 @@
-package com.GreenThumb.GT.repositories.ResourceExchangeRepositories;
+package com.GreenThumb.GT.repositories.MaterialExchangeRepositories;
 
-import com.GreenThumb.GT.models.ResourceExchange.Exchange;
+import com.GreenThumb.GT.models.MaterialExchange.Exchange;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

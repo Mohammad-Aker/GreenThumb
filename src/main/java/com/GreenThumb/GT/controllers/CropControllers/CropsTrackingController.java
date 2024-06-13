@@ -21,21 +21,19 @@ import java.util.Map;
 @RequestMapping("GreenThumb/api/crops-tracking")
 public class CropsTrackingController {
 
-    private CropsTrackingService cropsTrackingService;
-    private WeatherApiService weatherApiService;
-    private SoilDataService soilDataService;
-    private SoilService soilService;
-
-    private GeocodingService geocodingService;
-
+    private final CropsTrackingService cropsTrackingService;
+    private final WeatherApiService weatherApiService;
+    private final SoilDataService soilDataService;
+    private final GeocodingService geocodingService;
+    private final SoilService soilService;
 
     @Autowired
-    public CropsTrackingController(CropsTrackingService cropsTrackingService, WeatherApiService weatherApiService,SoilDataService soilDataService,GeocodingService geocodingService, SoilService soilService) {
+    public CropsTrackingController(CropsTrackingService cropsTrackingService, WeatherApiService weatherApiService, SoilDataService soilDataService, GeocodingService geocodingService, SoilService soilService) {
         this.cropsTrackingService = cropsTrackingService;
         this.weatherApiService = weatherApiService;
-        this.soilDataService=soilDataService;
-        this.geocodingService=geocodingService;
-        this.soilService=soilService;
+        this.soilDataService = soilDataService;
+        this.geocodingService = geocodingService;
+        this.soilService = soilService;
     }
 
     @GetMapping("/get-all")
@@ -63,32 +61,25 @@ public class CropsTrackingController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-
-
     @PutMapping("/planting/schedule/{userEmail}/{cropId}")
     public void schedulePlanting(@PathVariable String userEmail, @PathVariable Long cropId, @RequestParam("plantingDate") @DateTimeFormat(pattern = "dd/MM/yyyy") Date plantingDate) {
         cropsTrackingService.schedulePlanting(userEmail, cropId, plantingDate);
     }
 
-
     @PutMapping("/planting/{userEmail}/{cropId}")
     public void recordActualPlanting(@PathVariable String userEmail, @PathVariable Long cropId, @RequestParam Date actualPlantingDate) {
-      cropsTrackingService.recordActualPlanting(userEmail, cropId, actualPlantingDate);
+        cropsTrackingService.recordActualPlanting(userEmail, cropId, actualPlantingDate);
     }
-
 
     @PutMapping("/harvest/schedule/{userEmail}/{cropId}")
     public void scheduleHarvesting(@PathVariable String userEmail, @PathVariable Long cropId, @RequestParam("harvestingDate") @DateTimeFormat(pattern = "dd/MM/yyyy") Date harvestingDate) {
         cropsTrackingService.scheduleHarvesting(userEmail, cropId, harvestingDate);
     }
 
-
     @PutMapping("/harvesting/{userEmail}/{cropId}")
     public void recordActualHarvesting(@PathVariable String userEmail, @PathVariable Long cropId, @RequestParam Date actualHarvestDate) {
         cropsTrackingService.recordActualHarvesting(userEmail, cropId, actualHarvestDate);
     }
-
-
 
     @GetMapping("/rotations/{userEmail}/{cropId}")
     public ResponseEntity<String> getCropRotationNotes(@PathVariable String userEmail, @PathVariable Long cropId) {
@@ -100,14 +91,11 @@ public class CropsTrackingController {
         }
     }
 
-
     @GetMapping("/harvest-records/{userEmail}")
     public ResponseEntity<List<Object[]>> getCropsAndHarvestedQuantityByUser(@PathVariable String userEmail) {
         List<Object[]> cropsAndQuantities = cropsTrackingService.getCropsAndHarvestedQuantityByUser(userEmail);
         return new ResponseEntity<>(cropsAndQuantities, HttpStatus.OK);
     }
-
-
 
     @GetMapping("/weather/{userEmail}/{cropId}")
     public ResponseEntity<String> getWeatherForCrop(@PathVariable String userEmail, @PathVariable Long cropId) {
@@ -125,14 +113,10 @@ public class CropsTrackingController {
         }
     }
 
-
-
-
     @GetMapping("/geocode/{userEmail}/{cropId}")
     public ResponseEntity<Map<String, Float>> geocodeAddress(@PathVariable String userEmail, @PathVariable Long cropId) {
         try {
             String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
-
             if (location == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -144,10 +128,7 @@ public class CropsTrackingController {
         }
     }
 
-
-
-
-    @GetMapping("/soil/{userEmail}/{cropId}")
+    @GetMapping("/soil-data/{userEmail}/{cropId}")
     public ResponseEntity<Map<String, Object>> getSoilData(@PathVariable String userEmail, @PathVariable Long cropId) {
         try {
             String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
@@ -165,17 +146,10 @@ public class CropsTrackingController {
         }
     }
 
-
-
-
-
-
-
     @GetMapping("/soil/{userEmail}/{cropId}")
     public ResponseEntity<Map<String, Object>> getSoil(@PathVariable String userEmail, @PathVariable Long cropId) {
         try {
             String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
-
             if (location == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -189,5 +163,4 @@ public class CropsTrackingController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

@@ -1,6 +1,7 @@
-package com.GreenThumb.GT.models.ResourceExchange;
+package com.GreenThumb.GT.models.MaterialExchange;
 
-import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
+import com.GreenThumb.GT.models.MaterialExchange.Material.Material;
+import com.GreenThumb.GT.models.MaterialExchange.Material.MaterialType;
 import com.GreenThumb.GT.models.User.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,29 +15,24 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "exchanges")
-public class Exchange {
+@Table(name= "material_requests")
+public class MaterialRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "resource_id")
-    private Resource resource;
+    @JoinColumn(name = "user_email")
+    private User user;
 
     @ManyToOne
-    @JoinColumn(name = "request_id")
-    private ResourceRequest request;
+    @JoinColumn(name = "material_id")
+    private Material material;
 
-    @ManyToOne
-    @JoinColumn(name = "from_user_email")
-    private User fromUser;
-
-    @ManyToOne
-    @JoinColumn(name = "to_user_email")
-    private User toUser;
-
-    private String status;  // e.g., "pending", "completed"
+    private MaterialType materialType;
+    private int quantity;
+    private String description;
+    private String status;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

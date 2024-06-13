@@ -1,7 +1,7 @@
 package com.GreenThumb.GT.controllers.KnowledgeResourceControllers;
 
 import com.GreenThumb.GT.DTO.KnowledgeResourceDTOs.KnowledgeResourceDTO;
-import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
+import com.GreenThumb.GT.exceptions.MaterialNotFoundException;
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.KnowledgeResource.ResourceCategory;
 import com.GreenThumb.GT.models.User.User;
@@ -12,7 +12,6 @@ import com.GreenThumb.GT.services.KnowledgeResourceServices.ResourceRatingServic
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -190,7 +189,7 @@ public class KnowledgeResourceController {
             String userRole = user.getRole().name();
             knowledgeResourceService.deleteResource(title, user.getEmail(), userRole);
             return ResponseEntity.ok().build();
-        } catch (ResourceNotFoundException e) {
+        } catch (MaterialNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (KnowledgeResourceService.UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
