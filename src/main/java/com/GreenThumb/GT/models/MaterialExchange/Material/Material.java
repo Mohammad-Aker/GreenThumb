@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.models.ResourceExchange.Resource;
+package com.GreenThumb.GT.models.MaterialExchange.Material;
 
 import com.GreenThumb.GT.models.User.User;
 import jakarta.persistence.*;
@@ -12,8 +12,8 @@ import lombok.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="resources")
-public class Resource {
+@Table(name= "materials")
+public class Material {
     // Getters and Setters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class Resource {
 
     private int quantity ;
     @Enumerated(EnumType.STRING)
-    private ResourceType type;
+    private MaterialType type;
 
 
     @ManyToOne()

@@ -1,15 +1,15 @@
-package com.GreenThumb.GT.services.ResourceExchange;
+package com.GreenThumb.GT.services.MaterialExchange;
 
-import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ExchangeDTO;
+import com.GreenThumb.GT.DTO.MaterialExchangeDTO.ExchangeDTO;
 import com.GreenThumb.GT.exceptions.InvalidOperationException;
-import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
-import com.GreenThumb.GT.models.ResourceExchange.Exchange;
-import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
-import com.GreenThumb.GT.models.ResourceExchange.ResourceRequest;
+import com.GreenThumb.GT.exceptions.MaterialNotFoundException;
+import com.GreenThumb.GT.models.MaterialExchange.Exchange;
+import com.GreenThumb.GT.models.MaterialExchange.Material.Material;
+import com.GreenThumb.GT.models.MaterialExchange.MaterialRequest;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ExchangeRepository;
-import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ResourceRepository;
-import com.GreenThumb.GT.repositories.ResourceExchangeRepositories.ResourceRequestRepository;
+import com.GreenThumb.GT.repositories.MaterialExchangeRepositories.ExchangeRepository;
+import com.GreenThumb.GT.repositories.MaterialExchangeRepositories.MaterialRepository;
+import com.GreenThumb.GT.repositories.MaterialExchangeRepositories.MaterialRequestRepository;
 import com.GreenThumb.GT.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +29,10 @@ public class ExchangeService {
     private UserRepository userRepository;
 
     @Autowired
-    private ResourceRepository resourceRepository;
+    private MaterialRepository materialRepository;
 
     @Autowired
-    private ResourceRequestRepository resourceRequestRepository;
+    private MaterialRequestRepository materialRequestRepository;
 
     public List<ExchangeDTO> getAllExchanges() {
         return exchangeRepository.findAll().stream()
@@ -41,12 +41,12 @@ public class ExchangeService {
     }
 
     public ExchangeDTO extractUsersForExchange(ExchangeDTO dto) {
-        Resource resource = resourceRepository.findById(dto.getResourceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-        User fromUser = resource.getOwner();
+        Material material = materialRepository.findById(dto.getMaterialId())
+                .orElseThrow(() -> new MaterialNotFoundException("Material not found"));
+        User fromUser = material.getOwner();
 
-        ResourceRequest request = resourceRequestRepository.findById(dto.getRequestId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resource request not found"));
+        MaterialRequest request = materialRequestRepository.findById(dto.getRequestId())
+                .orElseThrow(() -> new MaterialNotFoundException("Material request not found"));
         User toUser = request.getUser();
 
         dto.setFromUserEmail(fromUser.getEmail());
@@ -57,24 +57,24 @@ public class ExchangeService {
 
     @Transactional
     public ExchangeDTO createExchange(ExchangeDTO dto) {
-        Resource resource = resourceRepository.findById(dto.getResourceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
+        Material material = materialRepository.findById(dto.getMaterialId())
+                .orElseThrow(() -> new MaterialNotFoundException("Material not found"));
         User fromUser = userRepository.findByEmail(dto.getFromUserEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("From user not found"));
+                .orElseThrow(() -> new MaterialNotFoundException("From user not found"));
 
-        ResourceRequest request = resourceRequestRepository.findById(dto.getRequestId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resource request not found"));
+        MaterialRequest request = materialRequestRepository.findById(dto.getRequestId())
+                .orElseThrow(() -> new MaterialNotFoundException("Material request not found"));
 
         if (!"OPEN".equals(request.getStatus())) {
             throw new InvalidOperationException("Cannot create exchange for a closed request");
         }
 
         User toUser = userRepository.findByEmail(dto.getToUserEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("To user not found"));
+                .orElseThrow(() -> new MaterialNotFoundException("To user not found"));
 
         // Create the exchange
         Exchange exchange = new Exchange();
-        exchange.setResource(resource);
+        exchange.setMaterial(material);
         exchange.setFromUser(fromUser);
         exchange.setToUser(toUser);
         exchange.setRequest(request);
@@ -87,26 +87,26 @@ public class ExchangeService {
     @Transactional
     public ExchangeDTO updateExchange(Long id, ExchangeDTO dto) {
         Exchange exchange = exchangeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Exchange not found"));
+                .orElseThrow(() -> new MaterialNotFoundException("Exchange not found"));
 
         if (dto.getStatus() != null) {
             exchange.setStatus(dto.getStatus());
             // If the status is set to 'completed', transfer ownership and close the request
             if (dto.getStatus().equalsIgnoreCase("completed")) {
                 // Transfer ownership of the resource
-                Resource resource = exchange.getResource();
+                Material material = exchange.getMaterial();
                 User toUser = exchange.getToUser();
-                resource.setOwner(toUser);
+                material.setOwner(toUser);
 
                 // Reduce the resource quantity
-                ResourceRequest request = exchange.getRequest();
+                MaterialRequest request = exchange.getRequest();
                 int requestedQuantity = request.getQuantity();
-                resource.setQuantity(resource.getQuantity() - requestedQuantity);
-                resourceRepository.save(resource);
+                material.setQuantity(material.getQuantity() - requestedQuantity);
+                materialRepository.save(material);
 
                 // Change the status of the request to 'CLOSED'
                 request.setStatus("CLOSED");
-                resourceRequestRepository.save(request);
+                materialRequestRepository.save(request);
             }
         }
 
@@ -122,7 +122,7 @@ public class ExchangeService {
     private ExchangeDTO convertToDTO(Exchange exchange) {
         ExchangeDTO dto = new ExchangeDTO();
         dto.setId(exchange.getId());
-        dto.setResourceId(exchange.getResource().getId());
+        dto.setMaterialId(exchange.getMaterial().getId());
         dto.setRequestId(exchange.getRequest().getId());
         dto.setFromUserEmail(exchange.getFromUser().getEmail());
         dto.setToUserEmail(exchange.getToUser().getEmail());

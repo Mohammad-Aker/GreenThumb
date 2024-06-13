@@ -28,7 +28,7 @@
 
 
 <details>
-  <summary><h2>🌿 Table of Contents<h2\></summary>
+  <summary><h2>🌿 Table of Contents</h2></summary>
   <ol>
     <li><a href="#intro">Introduction (What's Greenthumb?)</a></li>
     <li><a href="#coref">Core Features</a></li>

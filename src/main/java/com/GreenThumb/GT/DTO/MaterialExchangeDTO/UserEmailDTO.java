@@ -1,4 +1,4 @@
-package com.GreenThumb.GT.DTO.ResourceExchangeDTO;
+package com.GreenThumb.GT.DTO.MaterialExchangeDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

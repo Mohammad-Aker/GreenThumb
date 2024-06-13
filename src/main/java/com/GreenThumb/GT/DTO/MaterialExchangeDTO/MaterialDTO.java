@@ -1,8 +1,8 @@
-package com.GreenThumb.GT.DTO.ResourceExchangeDTO;
+package com.GreenThumb.GT.DTO.MaterialExchangeDTO;
 
 import com.GreenThumb.GT.Views.Views;
-import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
-import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
+import com.GreenThumb.GT.models.MaterialExchange.Material.Material;
+import com.GreenThumb.GT.models.MaterialExchange.Material.MaterialType;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResourceDTO {
+public class MaterialDTO {
     @JsonView(Views.User.class)
 
     private Long id;
@@ -27,7 +27,7 @@ public class ResourceDTO {
     private double price;
     @JsonView(Views.User.class)
 
-        private ResourceType type;
+        private MaterialType type;
     @JsonView(Views.ADMIN.class)
     private int quantity; // Visible only to admins
 
@@ -36,7 +36,7 @@ public class ResourceDTO {
 
         private UserDTO owner;
 
-        public ResourceDTO(Resource exchange) {
+        public MaterialDTO(Material exchange) {
             this.id = exchange.getId();
             this.name = exchange.getName();
             this.description = exchange.getDescription();

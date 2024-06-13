@@ -1,6 +1,6 @@
-package com.GreenThumb.GT.DTO.ResourceExchangeDTO;
+package com.GreenThumb.GT.DTO.MaterialExchangeDTO;
 
-import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
+import com.GreenThumb.GT.models.MaterialExchange.Material.MaterialType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 public class ExchangeDTO {
     private Long id;
-    private Long resourceId;
+    private Long materialId;
     private Long requestId;  // Link to resource requests
     private String fromUserEmail;
     private String toUserEmail;
     private String status;
-    private ResourceType resourceType;  // Add this field
+    private MaterialType materialType;  // Add this field
 }

@@ -1,6 +1,6 @@
 package com.GreenThumb.GT.services.KnowledgeResourceServices;
 
-import com.GreenThumb.GT.exceptions.ResourceNotFoundException;
+import com.GreenThumb.GT.exceptions.MaterialNotFoundException;
 import com.GreenThumb.GT.models.KnowledgeResource.KnowledgeResource;
 import com.GreenThumb.GT.models.ResourceRating.ResourceRating;
 import com.GreenThumb.GT.models.User.User;
@@ -169,7 +169,7 @@ public class ResourceRatingService {
     public List<ResourceRatingResponse> getRatingsForResource(String resourceTitle) {
         List<ResourceRating> ratings = resourceRatingRepository.findByResource_Title(resourceTitle);
         if (ratings.isEmpty()) {
-            throw new ResourceNotFoundException("No ratings found for the title: " + resourceTitle);
+            throw new MaterialNotFoundException("No ratings found for the title: " + resourceTitle);
         }
 
         return ratings.stream()

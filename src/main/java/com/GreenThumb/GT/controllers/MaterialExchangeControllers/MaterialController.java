@@ -1,13 +1,13 @@
 package com.GreenThumb.GT.controllers.MaterialExchangeControllers;
 
-import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceCreationDTO;
-import com.GreenThumb.GT.DTO.ResourceExchangeDTO.ResourceDTO;
-import com.GreenThumb.GT.DTO.ResourceExchangeDTO.UserDTO;
+import com.GreenThumb.GT.DTO.MaterialExchangeDTO.MaterialCreationDTO;
+import com.GreenThumb.GT.DTO.MaterialExchangeDTO.MaterialDTO;
+import com.GreenThumb.GT.DTO.MaterialExchangeDTO.UserDTO;
 import com.GreenThumb.GT.Views.Views;
-import com.GreenThumb.GT.models.ResourceExchange.Resource.Resource;
-import com.GreenThumb.GT.models.ResourceExchange.Resource.ResourceType;
+import com.GreenThumb.GT.models.MaterialExchange.Material.Material;
+import com.GreenThumb.GT.models.MaterialExchange.Material.MaterialType;
 import com.GreenThumb.GT.models.User.User;
-import com.GreenThumb.GT.services.ResourceExchange.ResourceService;
+import com.GreenThumb.GT.services.MaterialExchange.MaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
@@ -19,47 +19,47 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("GreenThumb/api/resources")
+@RequestMapping("GreenThumb/api/materials")
 public class MaterialController {
 
     @Autowired
-    private ResourceService service;
+    private MaterialService service;
 
     @GetMapping("/get-all")
     @PreAuthorize("hasAuthority('USER')or hasAuthority('ADMIN')")
-    public ResponseEntity<?> getResources(
+    public ResponseEntity<?> getMaterials(
             @AuthenticationPrincipal User user,
-            @RequestParam(required = false) ResourceType type) {
+            @RequestParam(required = false) MaterialType type) {
         try {
-            List<Resource> resources = service.getResources(type);
-            List<ResourceDTO> resourceDtos = mapResourcesToDtos(resources);
+            List<Material> materials = service.getMaterials(type);
+            List<MaterialDTO> materialDtos = mapMaterialToDtos(materials);
 
             Class<?> jsonView = user.getRole().name().equals("ADMIN") ? Views.ADMIN.class : Views.USER_R.class;
 
             // Applying the appropriate JsonView to the response
-            MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(resourceDtos);
+            MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(materialDtos);
             mappingJacksonValue.setSerializationView(jsonView);
 
             return ResponseEntity.ok(mappingJacksonValue);
         }catch(Exception e){
-            return ResponseEntity.badRequest().body("Failed to get resource.");
+            return ResponseEntity.badRequest().body("Failed to get material.");
         }
     }
-    private List<ResourceDTO> mapResourcesToDtos(List<Resource> resources) {
-        return resources.stream()
+    private List<MaterialDTO> mapMaterialToDtos(List<Material> materials) {
+        return materials.stream()
                 .map(this::convertToDto) // Assuming there is a method that converts entities to DTOs
                 .collect(Collectors.toList());
     }
-    private ResourceDTO convertToDto(Resource resource) {
-        ResourceDTO dto = new ResourceDTO();
-        UserDTO userDto = new UserDTO(resource.getOwner().getEmail(),resource.getOwner().getPhoneNumber(),resource.getOwner().getUsername(),resource.getOwner().getRole());
-        dto.setId(resource.getId());
-        dto.setName(resource.getName());
-        dto.setDescription(resource.getDescription());
-        dto.setPrice(resource.getPrice());
-        dto.setQuantity(resource.getQuantity());
-        dto.setType(resource.getType());
-        if (resource.getOwner() != null) {
+    private MaterialDTO convertToDto(Material material) {
+        MaterialDTO dto = new MaterialDTO();
+        UserDTO userDto = new UserDTO(material.getOwner().getEmail(), material.getOwner().getPhoneNumber(), material.getOwner().getUsername(), material.getOwner().getRole());
+        dto.setId(material.getId());
+        dto.setName(material.getName());
+        dto.setDescription(material.getDescription());
+        dto.setPrice(material.getPrice());
+        dto.setQuantity(material.getQuantity());
+        dto.setType(material.getType());
+        if (material.getOwner() != null) {
             dto.setOwner(userDto);
         }
         return dto;
@@ -69,27 +69,27 @@ public class MaterialController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER')or hasAuthority('EXPERT')")
-    public ResponseEntity<String> addResource(
-            @RequestBody ResourceCreationDTO resourceDto,
+    public ResponseEntity<String> addMaterial(
+            @RequestBody MaterialCreationDTO materialDto,
             @AuthenticationPrincipal User user) {
         String ownerEmail = user.getUsername();
         try {
-            Resource resource = service.createResource(resourceDto,ownerEmail);
-            return ResponseEntity.ok("Resource has been successfully created.");
+            Material material = service.createMaterial(materialDto,ownerEmail);
+            return ResponseEntity.ok("Material has been successfully created.");
         } catch(Exception e) {
-            return ResponseEntity.badRequest().body("Failed to create resource.");
+            return ResponseEntity.badRequest().body("Failed to create material.");
         }
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('USER')or hasAuthority('EXPERT')")
-    public ResponseEntity<String> updateResource(
+    public ResponseEntity<String> updateMaterial(
             @PathVariable Long id,
-            @RequestBody ResourceCreationDTO resourceDto,
+            @RequestBody MaterialCreationDTO materialDto,
             @AuthenticationPrincipal User user) {
         try {
-            service.updateResource(id, resourceDto, user.getEmail());
-            return ResponseEntity.ok("Resource has been successfully updated.");
+            service.updateMaterial(id, materialDto, user.getEmail());
+            return ResponseEntity.ok("Material has been successfully updated.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -97,12 +97,12 @@ public class MaterialController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('USER')or hasAuthority('EXPERT')")
-    public ResponseEntity<String> deleteResource(
+    public ResponseEntity<String> deleteMaterial(
             @PathVariable Long id,
             @AuthenticationPrincipal User user) {
         try {
-            service.deleteResource(id, user.getEmail());
-            return ResponseEntity.ok("Resource has been successfully deleted.");
+            service.deleteMaterial(id, user.getEmail());
+            return ResponseEntity.ok("Material has been successfully deleted.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
