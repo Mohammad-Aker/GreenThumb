@@ -148,7 +148,7 @@ Check out our project demo to see it in action! Click the link here to experienc
   <img src="https://contrib.rocks/image?repo=Mohammad-Aker/GreenThumb" />
 </a> </p>
 <p align="center"> <strong>Contributions are always welcome!</strong> </p>
-<p align="center"> You can start your contribution journey by reading the <a href="https://github.com/Mohammad-Aker/GreenThumb/wiki">Contribution</a> document 🎉 </p>
+<p align="center"> You can start your contribution journey by reading the <a href="https://github.com/Mohammad-Aker/GreenThumb/blob/main/Contribution.md">Contribution</a> document 🎉 </p>
 <br>
 <br>
 
