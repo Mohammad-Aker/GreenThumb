@@ -139,7 +139,7 @@ Access the Google Cloud SQL instance and set up the database configurations in `
 
 <a name="API"></a>
 ## 📄 API Documentation
-The API is comprehensively documented using Postman. Access the documentation by navigating to [link] once the backend is operational. This documentation covers all available endpoints, request parameters, response formats, and example requests and responses.
+The API is comprehensively documented using Postman. Access the documentation by navigating to <a href="https://documenter.getpostman.com/view/36132853/2sA3XPC2vz?fbclid=IwZXh0bgNhZW0CMTAAAR0tcu44KIqRbp8HjjfAHRF1QnBkxzFu8aDxbYGTza4pRAlS5zytNN74sfM_aem_AWDZfjoZP2dm1OYWxrCSFApKQxj7LCv7K9Fj4wvIIK0pLRxTInh2JZzl8CrIi7Wgra5mWrNom5ehE6UdqLtPbkHe"><strong>API documentation</strong></a> once the backend is operational. This documentation covers all available endpoints, request parameters, response formats, and example requests and responses.
 
 <br>
 <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
