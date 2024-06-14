@@ -80,7 +80,19 @@
  <br>
  <br>
 
+## 🕵️‍♂️ Roles
+Roles are actually like digital security guards. They check user IDs and say "yes" or "no" to some actions, like deleting gardens or viewing other people's stuff. This keeps everyone safe and in their own areas of the app. In this project, we implemented the following roles:
+* <strong>Admin:</strong> This role has the most extensive permissions, including managing all aspects of community gardens (create, view, update, delete), approving or rejecting garden applications, and accessing all user data.<br>
+* <strong>Representative:</strong> This role can manage events, including creating and deleting them. They seem to be associated with specific community gardens.<br>
+*<strong> Expert: </strong>Experts can create, view, update and delete crops and planting schedules, as well as access soil and weather data related to the crops. They can also search for materials and exchanges.<br>
+* <strong>User: </strong>Users can create, view, update and delete their own crops and planting schedules, join and leave community gardens, search for materials and exchanges, and view their harvest records.<br>
+*<strong> Volunteer:</strong> Volunteers can view all volunteering opportunities, create and delete their own volunteering registrations, and participate in event volunteering.<br>
+ <br>
+ <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
+ <br>
+ <br>
 
+ 
 <a name="bw"></a>
 ## 🏡 Built With
 * [![SpringBoot][Spring-boot]][SpringURL] <br>An open-source Java framework for creating stand-alone, production-grade applications.
