@@ -33,10 +33,12 @@
     <li><a href="#intro">Introduction (What's Greenthumb?)</a></li>
     <li><a href="#coref">Core Features</a></li>
     <li><a href="#addf">Additional Features</a></li>
+    <li><a href="#roles">Roles</a></li>
     <li><a href="#bw">Built With</a></li>
     <li><a href="#gs">Getting Started</a></li>
     <li><a href="#API">API Documentation</a></li>
     <li><a href="#demo">Demo</a></li>
+    <li><a href="#contribution">Contribution</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
@@ -81,6 +83,8 @@
  <br>
  <br>
 
+
+<a name="roles"></a>
 ## 🕵️‍♂️ Roles
 Roles are actually like digital security guards. They check user IDs and say "yes" or "no" to some actions, like deleting gardens or viewing other people's stuff. This keeps everyone safe and in their own areas of the app. In this project, we implemented the following roles:
 * <strong>Admin:</strong> This role has the most extensive permissions, including managing all aspects of community gardens (create, view, update, delete), approving or rejecting garden applications, and accessing all user data.<br>
@@ -156,6 +160,8 @@ Check out our project demo to see it in action! Click the link here to experienc
 <br>
 <br>
 
+
+<a name="contribution"></a>
 ## :wave: Contributing 
 <p align="right"> <a href="https://github.com/Mohammad-Aker/GreenThumb/graphs/contributors"><img src="https://img.shields.io/github/contributors/Mohammad-Aker/GreenThumb" alt="contributors" /></a> </p>
 <p align="center"><a href="https://github.com/Mohammad-Aker/GreenThumb/graphs/contributors">
