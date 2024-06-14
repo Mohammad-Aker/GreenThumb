@@ -56,13 +56,18 @@ public class MaterialRequestService {
         return convertToDTO(savedRequest);
     }
 
-    public Optional<MaterialRequestDTO> getRequestById(Long id) {
+    public Optional<MaterialRequestDTO> getRequestById(Long id, String userEmail) {
         return requestRepository.findById(id)
+                .filter(request -> request.getUser().getEmail().equals(userEmail))
                 .map(this::convertToDTO);
     }
 
-    public MaterialRequestDTO updateRequest(Long id, MaterialRequestDTO dto) {
+    public MaterialRequestDTO updateRequest(Long id, MaterialRequestDTO dto, String userEmail) {
         MaterialRequest request = requestRepository.findById(id).orElseThrow(() -> new MaterialNotFoundException("Request not found"));
+
+        if (!request.getUser().getEmail().equals(userEmail)) {
+            throw new InvalidRequestException("You are not authorized to update this request");
+        }
 
         request.setMaterialType(dto.getMaterialType());
         request.setQuantity(dto.getQuantity());
@@ -73,10 +78,13 @@ public class MaterialRequestService {
         return convertToDTO(updatedRequest);
     }
 
-    public void deleteRequest(Long id) {
-        if (!requestRepository.existsById(id)) {
-            throw new MaterialNotFoundException("Request not found");
+    public void deleteRequest(Long id, String userEmail) {
+        MaterialRequest request = requestRepository.findById(id).orElseThrow(() -> new MaterialNotFoundException("Request not found"));
+
+        if (!request.getUser().getEmail().equals(userEmail)) {
+            throw new InvalidRequestException("You are not authorized to delete this request");
         }
+
         requestRepository.deleteById(id);
     }
 

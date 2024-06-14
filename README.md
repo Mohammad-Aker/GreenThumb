@@ -5,15 +5,15 @@
 <div align="center">
   <br>
   <h1>Greenthumb 🌱</h1>
-  <strong>Welcome to GreenThumb, Cultivating urban green spaces and sustainable living communities!</strong> <br>
-  <a href="https://github.com/Mohammad-Aker/GreenThumb"><strong>  Check out the documentation »</strong></a>
+  <strong>Welcome to GreenThumb, Cultivating urban green spaces and sustainable living communities!</strong> &nbsp;<br>
+  <a href="https://github.com/Mohammad-Aker/GreenThumb"><strong>Check out the documentation »</strong></a>
 </div>
 <br>
 <div align="center">
   <p align="center">
     <a href="Demo Link">👾 View Demo</a>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <a href="https://github.com/Mohammad-Aker/GreenThumb/issues">🐞 Report Bug </a>
+    <a href="https://github.com/Mohammad-Aker/GreenThumb/issues/new">🐞 Report Bug </a>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="https://github.com/Mohammad-Aker/GreenThumb/issues">🧩 Request Feature</a>
   </p>
@@ -28,15 +28,17 @@
 
 
 <details>
-  <summary><h2>🌿 Table of Contents</h2></summary>
+  <summary><h2>🌿 Table of Contents<h2\></summary>
   <ol>
     <li><a href="#intro">Introduction (What's Greenthumb?)</a></li>
     <li><a href="#coref">Core Features</a></li>
     <li><a href="#addf">Additional Features</a></li>
+    <li><a href="#roles">Roles</a></li>
     <li><a href="#bw">Built With</a></li>
     <li><a href="#gs">Getting Started</a></li>
     <li><a href="#API">API Documentation</a></li>
     <li><a href="#demo">Demo</a></li>
+    <li><a href="#contribution">Contribution</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
@@ -64,20 +66,39 @@
 ▶️ For more details on <strong>Core Features</strong> visit the <a href="https://github.com/Mohammad-Aker/GreenThumb/wiki">Wiki</a> section.
  <br>
  <br>
+ <br>
+ <br>
 
  
 <a name="addf"></a>
 ## 🐞 Additional Features
 <strong>1. Chat System: </strong>Events group chats enable volunteers and representatives to communicate within event-specific group chats in real-time , enhancing coordination and collaboration within the event community.<br>
 <strong>2. External API Integration: </strong> Utilized to enhance functionality and supplement data collection.<br>
-<strong>3. Testing: </strong> Guaranteeing a robust and stable platform for community garden management<br>
-<strong>4. Docker: </strong> Simplifies software deployment by packaging applications into portable containers.<br>
+<strong>3. Security: </strong>Privacy, security and encryption are provided as all passwords are encrypted. For more details visit our <a href="https://github.com/Mohammad-Aker/GreenThumb/wiki">Wiki.</a> <br>
+<strong>4. Testing: </strong> Guaranteeing a robust and stable platform for crafting project management.<br>
+<strong>5. Docker: </strong> Simplifies software deployment by packaging applications into portable containers.<br>
+
  <br>
  <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
  <br>
  <br>
 
 
+<a name="roles"></a>
+## 🕵️‍♂️ Roles
+Roles are actually like digital security guards. They check user IDs and say "yes" or "no" to some actions, like deleting gardens or viewing other people's stuff. This keeps everyone safe and in their own areas of the app. In this project, we implemented the following roles:
+* <strong>Admin:</strong> This role has the most extensive permissions, including managing all aspects of community gardens (create, view, update, delete), approving or rejecting garden applications, and accessing all user data.<br>
+* <strong>Representative:</strong> This role can manage events, including creating and deleting them. They seem to be associated with specific community gardens.<br>
+* <strong> Expert: </strong>Experts can create, view, update and delete crops and planting schedules, as well as access soil and weather data related to the crops. They can also search for materials and exchanges.<br>
+
+* <strong>User: </strong>Users can create, view, update and delete their own crops and planting schedules, join and leave community gardens, search for materials and exchanges, and view their harvest records.<br>
+* <strong> Volunteer:</strong> Volunteers can view all volunteering opportunities, create and delete their own volunteering registrations, and participate in event volunteering.<br>
+ <br>
+ <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
+ <br>
+ <br>
+
+ 
 <a name="bw"></a>
 ## 🏡 Built With
 * [![SpringBoot][Spring-boot]][SpringURL] <br>An open-source Java framework for creating stand-alone, production-grade applications.
@@ -97,23 +118,22 @@
 ## 🚀 Getting Started
 ### ⚙️ Running the project
 #### To get started with the project:
-1. Clone the repository:
+##### 1. Clone the repository:
 > [![Github][Github]][wewe]
 >
 > ```sh
 > git clone https://github.com/Mohammad-Aker/GreenThumb
 > ```
-2. Install dependencies:
+##### 2. Configure the Database:
+Access the Google Cloud SQL instance and set up the database configurations in `application.properties`.
+##### 3. Run the Backend:
 >
 > ```sh
-> npm install
+> mvn spring-boot:run
 > ```
-4. DATABASE CONNECTION weweeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-5. Run the application:
->
-> ```sh
-> npm start
-> ```
+##### 4. Setup RabbitMQ:
+* Ensure RabbitMQ server is running.
+* Configure RabbitMQ settings in `application.properties`.
 
 <br>
 <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
@@ -123,7 +143,7 @@
 
 <a name="API"></a>
 ## 📄 API Documentation
-The API is comprehensively documented using Postman. Access the documentation by navigating to [link] once the backend is operational. This documentation covers all available endpoints, request parameters, response formats, and example requests and responses.
+The API is comprehensively documented using Postman. Access the documentation by navigating to <a href="https://documenter.getpostman.com/view/36132853/2sA3XPC2vz?fbclid=IwZXh0bgNhZW0CMTAAAR0tcu44KIqRbp8HjjfAHRF1QnBkxzFu8aDxbYGTza4pRAlS5zytNN74sfM_aem_AWDZfjoZP2dm1OYWxrCSFApKQxj7LCv7K9Fj4wvIIK0pLRxTInh2JZzl8CrIi7Wgra5mWrNom5ehE6UdqLtPbkHe"><strong>API documentation</strong></a> once the backend is operational. This documentation covers all available endpoints, request parameters, response formats, and example requests and responses.
 
 <br>
 <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
@@ -133,9 +153,22 @@ The API is comprehensively documented using Postman. Access the documentation by
 
 <a name="demo"></a>
 ## 🎥 Demo
-Check out our project demo to see it in action! Click the link below to experience the magic firsthand. <a href="Demo Link">🚀 View Demo</a>
+Check out our project demo to see it in action! Click the link here to experience the magic firsthand. <a href="Demo Link">🚀 View Demo</a>
 <br>
 <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
+<br>
+<br>
+<br>
+
+
+<a name="contribution"></a>
+## :wave: Contributing 
+<p align="right"> <a href="https://github.com/Mohammad-Aker/GreenThumb/graphs/contributors"><img src="https://img.shields.io/github/contributors/Mohammad-Aker/GreenThumb" alt="contributors" /></a> </p>
+<p align="center"><a href="https://github.com/Mohammad-Aker/GreenThumb/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Mohammad-Aker/GreenThumb" />
+</a> </p>
+<p align="center"> <strong>Contributions are always welcome!</strong> </p>
+<p align="center"> You can start your contribution journey by reading the <a href="https://github.com/Mohammad-Aker/GreenThumb/blob/main/Contribution.md">Contribution</a> document 🎉 </p>
 <br>
 <br>
 
@@ -144,7 +177,7 @@ Check out our project demo to see it in action! Click the link below to experien
 ## ☎️ Contact
 
 * Lama Ibrahim - lama.ibrahim@gmail.com
-* Mohammed Aker - mohammad.aker@gmail.com
+* Mohammed Aker - mohammadaker7@gmail.com
 * Shahd Salahat - Shahd.salahat@gmail.com
 * Dana Breik - Dana.breik@gmail.com
 <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
+
 @Service
 public class RabbitMQJsonProducer {
 
@@ -24,6 +26,11 @@ public class RabbitMQJsonProducer {
     }
 
     public void sendJsonMessage(Message message) {
+        // Ensure the timestamp is set here if not already set
+        if (message.getTimestamp() == null) {
+            message.setTimestamp(LocalDateTime.now());
+        }
+
         String routingKey = "event." + message.getEventName();
         LOGGER.info("Sending message to {}: {}", routingKey, message);
         rabbitTemplate.convertAndSend(exchange, routingKey, message);
