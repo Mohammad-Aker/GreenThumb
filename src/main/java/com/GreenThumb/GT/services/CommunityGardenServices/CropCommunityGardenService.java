@@ -16,17 +16,19 @@ public class CropCommunityGardenService {
 
     @Autowired
     private CommunityGardenRepository communityGardenRepository;
-
     public CropCommunityGarden updatePlotNumber(Long cropCommunityGardenId, boolean plotNumber) {
         Optional<CropCommunityGarden> optionalCropCommunityGarden = cropCommunityGardenRepository.findById(cropCommunityGardenId);
 
         if (optionalCropCommunityGarden.isPresent()) {
             CropCommunityGarden cropCommunityGarden = optionalCropCommunityGarden.get();
+            CommunityGarden communityGarden = cropCommunityGarden.getCommunityGarden();
+
             if (cropCommunityGarden.isPlotNumber() && !plotNumber) { // If plotNumber is being set to false
-                CommunityGarden communityGarden = cropCommunityGarden.getCommunityGarden();
                 communityGarden.setAvailablePlots(communityGarden.getAvailablePlots() - 1);
-                communityGardenRepository.save(communityGarden);
+            } else if (!cropCommunityGarden.isPlotNumber() && plotNumber) { // If plotNumber is being set to true
+                communityGarden.setAvailablePlots(communityGarden.getAvailablePlots() + 1);
             }
+            communityGardenRepository.save(communityGarden);
             cropCommunityGarden.setPlotNumber(plotNumber);
             return cropCommunityGardenRepository.save(cropCommunityGarden);
         } else {

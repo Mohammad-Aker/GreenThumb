@@ -13,7 +13,7 @@ import java.util.Map;
 @Service
 public class SoilService {
 
-    private final String apiToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE2MDcxMjEzLCJpYXQiOjE3MTYwNzA5MTMsImp0aSI6IjQ0OGI0MmUwOTEyMjQyMmZiMWRiODQ3ODJmNTI1MjVjIiwidXNlcl9pZCI6NzZ9._Gncl19eyOU6nDXnM4rGhHNe3hWITAT5gpSUp_QOR1w";
+    private final String apiToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcxODQ1NTk1NSwiaWF0IjoxNzE4MzY5NTU1LCJqdGkiOiJiNDI4ZDZiNDRjNTU0Y2VlOTRlMzZiOTdjNjcwYmM5OCIsInVzZXJfaWQiOjc2fQ.6K9XfYj8cMLOP1imwk6w8p9sUOUoDnrdb2mXC3VFcD0";
     private final RestTemplate restTemplate;
 
     public SoilService() {

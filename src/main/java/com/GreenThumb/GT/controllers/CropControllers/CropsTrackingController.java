@@ -179,9 +179,9 @@ public class CropsTrackingController {
     }
 
 
-    @GetMapping("/soil/{userEmail}/{cropId}")
-    @PreAuthorize("hasAnyAuthority('USER', 'EXPERT','ADMIN')")
-    public ResponseEntity<Map<String, Object>> getSoil(@PathVariable String userEmail, @PathVariable Long cropId) {
+    @GetMapping("/soil/{cropId}")
+    public ResponseEntity<Map<String, Object>> getSoil(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cropId) {
+        String userEmail = userDetails.getUsername(); // Retrieve authenticated user's email
         try {
             String location = cropsTrackingService.getLocationForCrop(userEmail, cropId);
             if (location == null) {
