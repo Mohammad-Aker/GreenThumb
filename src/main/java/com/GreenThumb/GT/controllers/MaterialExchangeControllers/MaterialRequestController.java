@@ -44,16 +44,16 @@ public class MaterialRequestController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('EXPERT')")
-    public ResponseEntity<MaterialRequestDTO> getRequestById(@PathVariable Long id) {
-        Optional<MaterialRequestDTO> request = service.getRequestById(id);
+    public ResponseEntity<MaterialRequestDTO> getRequestById(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        Optional<MaterialRequestDTO> request = service.getRequestById(id, user.getEmail());
         return request.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('EXPERT')")
-    public ResponseEntity<?> updateRequest(@PathVariable Long id, @RequestBody MaterialRequestDTO requestDTO) {
+    public ResponseEntity<?> updateRequest(@PathVariable Long id, @RequestBody MaterialRequestDTO requestDTO, @AuthenticationPrincipal User user) {
         try {
-            MaterialRequestDTO updatedRequest = service.updateRequest(id, requestDTO);
+            MaterialRequestDTO updatedRequest = service.updateRequest(id, requestDTO, user.getEmail());
             return ResponseEntity.ok(updatedRequest);
         } catch (MaterialNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -64,9 +64,9 @@ public class MaterialRequestController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('EXPERT')")
-    public ResponseEntity<String> deleteRequest(@PathVariable Long id) {
+    public ResponseEntity<String> deleteRequest(@PathVariable Long id, @AuthenticationPrincipal User user) {
         try {
-            service.deleteRequest(id);
+            service.deleteRequest(id, user.getEmail());
             return ResponseEntity.ok("Request has been successfully deleted.");
         } catch (MaterialNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
