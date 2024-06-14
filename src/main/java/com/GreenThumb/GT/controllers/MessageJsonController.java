@@ -1,14 +1,18 @@
 package com.GreenThumb.GT.controllers;
 
 import com.GreenThumb.GT.DTO.Message;
-import com.GreenThumb.GT.services.MessageStorageService;
-import com.GreenThumb.GT.security.config.eventsChat.RabbitMQJsonProducer;
 import com.GreenThumb.GT.exceptions.UserNotAuthorizedException;
 import com.GreenThumb.GT.models.Events.Events;
 import com.GreenThumb.GT.models.Events.Volunteering;
 import com.GreenThumb.GT.repositories.EventsRepository.EventRepository;
 import com.GreenThumb.GT.repositories.EventsRepository.VolunteeringRepository;
+import com.GreenThumb.GT.security.config.eventsChat.RabbitMQJsonProducer;
+import com.GreenThumb.GT.services.MessageStorageService;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConversionException;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +32,7 @@ public class MessageJsonController {
     private final EventRepository eventsRepository;
     private final MessageStorageService messageStorageService;
     private final RabbitTemplate rabbitTemplate;
+    private final MessageConverter messageConverter;
 
     @Autowired
     public MessageJsonController(RabbitMQJsonProducer jsonProducer, VolunteeringRepository volunteeringRepository,
@@ -38,6 +43,7 @@ public class MessageJsonController {
         this.eventsRepository = eventsRepository;
         this.messageStorageService = messageStorageService;
         this.rabbitTemplate = rabbitTemplate;
+        this.messageConverter = new Jackson2JsonMessageConverter();
     }
 
     @PostMapping("/publish")
@@ -74,14 +80,29 @@ public class MessageJsonController {
             throw new UserNotAuthorizedException("You are not authorized to view this chat");
         }
 
-        // Consume messages from the queue
+        // Consume messages from the event queue
         List<Message> consumedMessages = new ArrayList<>();
-        while (true) {
-            Message message = (Message) rabbitTemplate.receiveAndConvert("eventQueue");
-            if (message == null) {
+        boolean keepConsuming = true;
+
+        while (keepConsuming) {
+            org.springframework.amqp.core.Message rawMessage = rabbitTemplate.receive("eventQueue");
+            if (rawMessage == null) {
                 break;
             }
-            consumedMessages.add(message);
+            try {
+                Message message = (Message) messageConverter.fromMessage(rawMessage);
+                if (eventName.equals(message.getEventName())) {
+                    consumedMessages.add(message);
+                } else {
+                    // Requeue the message
+                    rabbitTemplate.send("eventQueue", rawMessage);
+                    keepConsuming = false;
+                }
+            } catch (MessageConversionException e) {
+                // Handle message conversion failure
+                rabbitTemplate.send("eventQueue", rawMessage);
+                keepConsuming = false;
+            }
         }
 
         // Save consumed messages to MessageStorage
