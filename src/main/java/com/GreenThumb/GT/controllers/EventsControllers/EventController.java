@@ -45,9 +45,21 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/{eventId}/removePartner")
+    @PreAuthorize("hasAuthority('REPRESENTATIVE') or hasAuthority('ADMIN')")
+    public ResponseEntity<Events> removePartnerFromEvent(@PathVariable Long eventId) {
+        try {
+            Events updatedEvent = eventService.removePartnerFromEvent(eventId);
+            return ResponseEntity.ok(updatedEvent);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
+
+
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('REPRESENTATIVE')")
+    @PreAuthorize("hasAuthority('REPRESENTATIVE') or hasAuthority('ADMIN')")
     public ResponseEntity<Events> createEvent(@RequestBody Events event, @AuthenticationPrincipal UserDetails userDetails) {
         String userEmail = userDetails.getUsername();
         try {

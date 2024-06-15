@@ -1,6 +1,7 @@
 package com.GreenThumb.GT.services.EventsSrevices;
 
 import com.GreenThumb.GT.models.Events.Events;
+import com.GreenThumb.GT.models.Events.Partner;
 import com.GreenThumb.GT.models.User.User;
 import com.GreenThumb.GT.repositories.EventsRepository.EventRepository;
 import com.GreenThumb.GT.repositories.EventsRepository.PartnerRepository;
@@ -33,6 +34,31 @@ public class EventService {
 
     public Events createEvent(Events event) {
         return eventRepository.save(event);
+    }
+
+    public Events removePartnerFromEvent(Long eventId) {
+        Optional<Events> eventOpt = eventRepository.findById(eventId);
+
+        if (eventOpt.isPresent()) {
+            Events event = eventOpt.get();
+            event.setPartner(null);
+            return eventRepository.save(event);
+        } else {
+            throw new IllegalArgumentException("Event not found.");
+        }
+    }
+
+    public Events assignPartnerToEvent(Long eventId, Long partnerId) {
+        Optional<Events> eventOpt = eventRepository.findById(eventId);
+        Optional<Partner> partnerOpt = partnerRepository.findById(partnerId);
+
+        if (eventOpt.isPresent() && partnerOpt.isPresent()) {
+            Events event = eventOpt.get();
+            event.setPartner(partnerOpt.get());
+            return eventRepository.save(event);
+        } else {
+            throw new IllegalArgumentException("Event or Partner not found.");
+        }
     }
 
     public void deleteEvent(Long id) {
