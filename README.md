@@ -106,7 +106,7 @@ Roles are actually like digital security guards. They check user IDs and say "ye
 * [![Rabbitmq][Rabbit]][RabbitURL] <br>An open-source message broker software implementing the Advanced Message Queuing Protocol (AMQP).
 * [![Docker][Docker]][DockerURL] <br>A platform for building, sharing, and running applications in containers.
 * [![Postman][Postman]][PostmanURL] <br>A collaboration platform for designing, testing, and documenting APIs.
-* [![Github][Github][GithubURL] <br>A web-based platform for version control and collaboration using Git.
+* [![Github][Github]][GithubURL] <br>A web-based platform for version control and collaboration using Git.
 <br>
 <p align="right">(<a href="#readme-top">⬆️ Back to top</a>)</p>
 <br>
